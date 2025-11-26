@@ -29,8 +29,15 @@ public class UsuarioService {
 				.orElseThrow(() -> new RuntimeException("Usuario con ID " + id + " no encontrado"));
 
 		// Ahora sí: usuarioExistente es de tipo Usuario (no Optional)
-		usuarioExistente.setNombre_completo(usuarioActualizado.getNombre_completo());
-		usuarioExistente.setCorreo(usuarioActualizado.getCorreo());
+		// Actualización de los campos
+        usuarioExistente.setNombre_completo(usuarioActualizado.getNombre_completo());
+        usuarioExistente.setNombre_usuario(usuarioActualizado.getNombre_usuario());
+        usuarioExistente.setCorreo(usuarioActualizado.getCorreo());
+        usuarioExistente.setContrasena(usuarioActualizado.getContrasena());
+        usuarioExistente.setPais(usuarioActualizado.getPais());
+        usuarioExistente.setCiudad(usuarioActualizado.getCiudad());
+        usuarioExistente.setDescripcion(usuarioActualizado.getDescripcion());
+        usuarioExistente.setRutaimagen(usuarioActualizado.getRutaimagen());
 
 		return usuarioRepository.save(usuarioExistente);
 	}
