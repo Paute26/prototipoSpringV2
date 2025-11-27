@@ -74,4 +74,27 @@ public class UsuarioController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+    
+    // Login - autenticación 
+    
+    @PostMapping("/login")
+    public ResponseEntity<?> login(@RequestBody Usuario usuario) {
+        try {
+            Usuario usuarioLogueado = usuarioService.login(
+                usuario.getCorreo(), 
+                usuario.getContrasena()
+            );
+
+            // Ocultar la contraseña antes de enviar la respuesta
+            usuarioLogueado.setContrasena(null);
+
+            return ResponseEntity.ok(usuarioLogueado);
+
+        } catch (RuntimeException e) {
+            return ResponseEntity
+                    .status(HttpStatus.UNAUTHORIZED)
+                    .body(e.getMessage());
+        }
+    }
+
 }

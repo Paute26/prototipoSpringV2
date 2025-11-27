@@ -59,5 +59,16 @@ public class UsuarioService {
 		}
 		usuarioRepository.deleteById(id);
 	}
+      
+	// Metodo para verificar usuario
+    public Usuario login(String correo, String contrasena) {
+        Usuario usuario = usuarioRepository.findByCorreo(correo)
+                .orElseThrow(() -> new RuntimeException("Correo no registrado"));
 
+        if (!usuario.getContrasena().equals(contrasena)) {
+            throw new RuntimeException("Contraseña incorrecta");
+        }
+
+        return usuario; 
+    }
 }
