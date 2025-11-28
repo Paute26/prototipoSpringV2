@@ -6,7 +6,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/productos")
@@ -53,5 +55,15 @@ public class ProductoController {
             return ResponseEntity.noContent().build();
         }
         return ResponseEntity.notFound().build();
+    }
+    
+    @PostMapping("/eliminar")
+    public ResponseEntity<Map<String, String>> eliminarProductos(@RequestBody List<Long> ids) {
+        productoService.deleteProductos(ids);
+
+        Map<String, String> response = new HashMap<>();
+        response.put("message", "Productos eliminados correctamente");
+
+        return ResponseEntity.ok(response);
     }
 }

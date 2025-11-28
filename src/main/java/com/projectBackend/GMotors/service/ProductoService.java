@@ -55,7 +55,7 @@ public class ProductoService {
         return null;
     }
 
-    // Eliminar producto
+    // Eliminar producto por ID
     public boolean deleteProducto(Long id) {
         if (productoRepository.existsById(id)) {
             productoRepository.deleteById(id);
@@ -63,4 +63,11 @@ public class ProductoService {
         }
         return false;
     }
+    
+    // Eliminar varios productos 
+    public void deleteProductos(List<Long> ids) {
+        productoRepository.deleteAllById(ids);
+    }
+
+
 }
