@@ -4,6 +4,7 @@ import com.projectBackend.GMotors.model.Producto;
 import com.projectBackend.GMotors.repository.ProductoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import java.time.LocalDate;
 
 import java.util.List;
 
@@ -25,6 +26,10 @@ public class ProductoService {
 
     // Crear producto
     public Producto createProducto(Producto producto) {
+    	
+    	producto.setFecha_registro(LocalDate.now());
+        producto.setFecha_modificacion(LocalDate.now());
+        
         return productoRepository.save(producto);
     }
 
@@ -38,6 +43,12 @@ public class ProductoService {
             existing.setDescripcion(producto.getDescripcion());
             existing.setId_categoria(producto.getId_categoria());
             existing.setStock(producto.getStock());
+            existing.setCodigo_personal(producto.getCodigo_personal());
+            existing.setCodigo_proveedor(producto.getCodigo_proveedor());
+            existing.setPvp(producto.getPvp());
+
+            // IMPORTANTE:
+            existing.setFecha_modificacion(LocalDate.now());
 
             return productoRepository.save(existing);
         }
