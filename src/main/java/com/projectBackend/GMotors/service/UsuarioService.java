@@ -4,22 +4,38 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.projectBackend.GMotors.model.Usuario;
 import com.projectBackend.GMotors.repository.UsuarioRepository;
+
 
 @Service
 public class UsuarioService {
 
 	@Autowired
 	private UsuarioRepository usuarioRepository;
+	
+	
+	@Autowired
+    private PasswordEncoder passwordEncoder;
 
 	// METODOS
 
 	// Crear Usuario
 	public Usuario crearUsuario(Usuario usuario) {
-		return usuarioRepository.save(usuario);
+		
+        // Encriptar la contraseña antes de guardar
+        usuario.setContrasena(passwordEncoder.encode(usuario.getContrasena()));
+
+        // Guardar en BD
+        Usuario nuevo = usuarioRepository.save(usuario);
+
+        // No enviar la contraseña al frontend
+        nuevo.setContrasena(null);
+
+        return nuevo;
 	}
 
 	// Modificar Usuario
@@ -33,15 +49,25 @@ public class UsuarioService {
         usuarioExistente.setNombre_completo(usuarioActualizado.getNombre_completo());
         usuarioExistente.setNombre_usuario(usuarioActualizado.getNombre_usuario());
         usuarioExistente.setCorreo(usuarioActualizado.getCorreo());
-        usuarioExistente.setContrasena(usuarioActualizado.getContrasena());
         usuarioExistente.setPais(usuarioActualizado.getPais());
         usuarioExistente.setCiudad(usuarioActualizado.getCiudad());
         usuarioExistente.setDescripcion(usuarioActualizado.getDescripcion());
         usuarioExistente.setRutaimagen(usuarioActualizado.getRutaimagen());
+        
+     // Si envían nueva contraseña → encriptar
+        if (usuarioActualizado.getContrasena() != null && !usuarioActualizado.getContrasena().isBlank()) {
+            usuarioExistente.setContrasena(
+                passwordEncoder.encode(usuarioActualizado.getContrasena())
+            );
+        }
 
-		return usuarioRepository.save(usuarioExistente);
+        Usuario actualizado = usuarioRepository.save(usuarioExistente);
+        actualizado.setContrasena(null);
+
+        return actualizado;
 	}
 
+	
 	// Método para buscar por ID
 	public Optional<Usuario> buscarPorId(Long id) {
 		return usuarioRepository.findById(id);
@@ -65,10 +91,14 @@ public class UsuarioService {
         Usuario usuario = usuarioRepository.findByCorreo(correo)
                 .orElseThrow(() -> new RuntimeException("Correo no registrado"));
 
-        if (!usuario.getContrasena().equals(contrasena)) {
+        // Comparar hash
+        if (!passwordEncoder.matches(contrasena, usuario.getContrasena())) {
             throw new RuntimeException("Contraseña incorrecta");
         }
 
-        return usuario; 
+        // No enviar hash al frontend
+        usuario.setContrasena(null);
+
+        return usuario;
     }
 }
