@@ -56,7 +56,7 @@ public class JwtFilter extends OncePerRequestFilter {
                 return;
             }
 
-            // ⭐⭐ AUTENTICAR AL USUARIO EN SPRING SECURITY ⭐⭐
+            // AUTENTICAR AL USUARIO EN SPRING SECURITY
             UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken("user", null, List.of());
 
@@ -66,7 +66,7 @@ public class JwtFilter extends OncePerRequestFilter {
             return;
         }
 
-        // Si no hay token → 401
+        // Si no hay token → error 401
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
 
