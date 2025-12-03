@@ -14,38 +14,42 @@ import org.springframework.http.HttpMethod;
 @Configuration
 public class SecurityConfig {
 
-	
-	@Autowired
+    @Autowired
     private JwtFilter jwtFilter;
-	
-	// Encrytar las contraseñas
-	
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
-    
-    // Proteger las rutas
+
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
         http
             .csrf(cs -> cs.disable())
             .cors(cors -> cors.configure(http))
             .authorizeHttpRequests(auth -> auth
 
-                // Rutas públicas 
+                // ============================
+                //   RUTAS PÚBLICAS (SIN TOKEN)
+                // ============================
                 .requestMatchers("/api/usuarios/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll() // Registro
 
-                // Rutas protegidas 
+                // ============================
+                //   RUTAS PROTEGIDAS
+                // ============================
                 .requestMatchers("/api/usuarios/**").authenticated()
 
-                // Cualquier otra ruta también requiere token
+                // Cualquier otra ruta, requiere token
                 .anyRequest().authenticated()
             )
+
+            // Filtro JWT ANTES del filtro de autenticación
             .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+    
 }
 

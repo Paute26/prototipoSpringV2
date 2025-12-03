@@ -8,6 +8,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 import java.io.IOException;
 
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import java.util.List;
+
 
 
 // Spring intercepta cada request, extrae el token y valida.
@@ -24,7 +28,7 @@ public class JwtFilter extends OncePerRequestFilter {
             FilterChain filterChain)
             throws ServletException, IOException {
 
-        // ⭐ Permitir preflight (CORS)
+        // Permitir preflight CORS
         if (request.getMethod().equalsIgnoreCase("OPTIONS")) {
             response.setStatus(HttpServletResponse.SC_OK);
             return;
@@ -32,18 +36,19 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        // ⭐ RUTAS PÚBLICAS
+        // Rutas públicas
         if (path.equals("/api/usuarios/login") ||
-            (path.equals("/api/usuarios") && request.getMethod().equals("POST"))) {
+                (path.equals("/api/usuarios") && request.getMethod().equals("POST"))) {
 
             filterChain.doFilter(request, response);
             return;
         }
 
-        // ⭐ EXTRAER TOKEN
+        // Extraer token
         String header = request.getHeader("Authorization");
 
         if (header != null && header.startsWith("Bearer ")) {
+
             String token = header.substring(7);
 
             if (!jwtUtil.validarToken(token)) {
@@ -51,12 +56,18 @@ public class JwtFilter extends OncePerRequestFilter {
                 return;
             }
 
+            // ⭐⭐ AUTENTICAR AL USUARIO EN SPRING SECURITY ⭐⭐
+            UsernamePasswordAuthenticationToken auth =
+                    new UsernamePasswordAuthenticationToken("user", null, List.of());
+
+            SecurityContextHolder.getContext().setAuthentication(auth);
+
             filterChain.doFilter(request, response);
             return;
         }
 
-        // ⭐ Si llegó aquí, requiere token
+        // Si no hay token → 401
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
     }
-    
+
 }
