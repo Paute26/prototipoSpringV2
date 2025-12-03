@@ -5,11 +5,14 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import com.projectBackend.GMotors.config.JwtUtil;
+import com.projectBackend.GMotors.dto.AuthResponse;
 import com.projectBackend.GMotors.model.Usuario;
 import com.projectBackend.GMotors.service.UsuarioService;
 
 import java.util.List;
 import java.util.Optional;
+
 
 @RestController
 @RequestMapping("/api/usuarios")
@@ -17,6 +20,9 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioService usuarioService;
+    
+    @Autowired
+    private JwtUtil jwtUtil;
 
     // ✅ POST /api/usuarios → Crear
     @PostMapping
@@ -85,10 +91,11 @@ public class UsuarioController {
                 usuario.getContrasena()
             );
 
-            // Ocultar la contraseña antes de enviar la respuesta
-            usuarioLogueado.setContrasena(null);
+            String token = jwtUtil.generarToken(usuarioLogueado.getCorreo());
 
-            return ResponseEntity.ok(usuarioLogueado);
+            return ResponseEntity.ok(
+                new AuthResponse(usuarioLogueado, token)
+            );
 
         } catch (RuntimeException e) {
             return ResponseEntity

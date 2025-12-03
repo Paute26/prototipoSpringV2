@@ -5,11 +5,47 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.http.HttpMethod;
+
 @Configuration
 public class SecurityConfig {
 
+	
+	@Autowired
+    private JwtFilter jwtFilter;
+	
+	// Encrytar las contraseñas
+	
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+    
+    // Proteger las rutas
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        http
+            .csrf(cs -> cs.disable())
+            .cors(cors -> cors.configure(http))
+            .authorizeHttpRequests(auth -> auth
+
+                // Rutas públicas 
+                .requestMatchers("/api/usuarios/login").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll() // Registro
+
+                // Rutas protegidas 
+                .requestMatchers("/api/usuarios/**").authenticated()
+
+                // Cualquier otra ruta también requiere token
+                .anyRequest().authenticated()
+            )
+            .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
+
+        return http.build();
+    }
 }
+
