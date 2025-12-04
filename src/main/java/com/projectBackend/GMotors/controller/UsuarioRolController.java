@@ -1,5 +1,6 @@
 package com.projectBackend.GMotors.controller;
 
+import com.projectBackend.GMotors.dto.UsuarioRolDTO;
 import com.projectBackend.GMotors.model.UsuarioRol;
 import com.projectBackend.GMotors.service.UsuarioRolService;
 
@@ -13,38 +14,44 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/usuario_rol")
+@CrossOrigin(origins = "*")
 public class UsuarioRolController {
 
     @Autowired
     private UsuarioRolService usuarioRolService;
 
-    // 🔹 Crear relación usuario-rol
+    // ====================================================
+    // CREAR relación
+    // ====================================================
     @PostMapping
     public ResponseEntity<UsuarioRol> crear(@RequestBody UsuarioRol usuarioRol) {
-        UsuarioRol nuevaRelacion = usuarioRolService.crearRelacion(usuarioRol);
-        return ResponseEntity.status(HttpStatus.CREATED).body(nuevaRelacion);
+        return new ResponseEntity<>(usuarioRolService.crearRelacion(usuarioRol), HttpStatus.CREATED);
     }
 
-    // 🔹 Obtener una relación por id_usuario e id_rol
+    // ====================================================
+    // OBTENER relación (sin importar estado)
+    // ====================================================
     @GetMapping("/{idUsuario}/{idRol}")
     public ResponseEntity<UsuarioRol> obtenerPorId(
             @PathVariable Integer idUsuario,
             @PathVariable Integer idRol) {
 
         Optional<UsuarioRol> relacion = usuarioRolService.buscarPorId(idUsuario, idRol);
-
         return relacion.map(ResponseEntity::ok)
-                       .orElseGet(() -> ResponseEntity.notFound().build());
+                .orElse(ResponseEntity.notFound().build());
     }
 
-    // 🔹 Listar todas las relaciones
+    // ====================================================
+    // LISTAR todas
+    // ====================================================
     @GetMapping
     public ResponseEntity<List<UsuarioRol>> listarTodas() {
-        List<UsuarioRol> relaciones = usuarioRolService.listarTodas();
-        return ResponseEntity.ok(relaciones);
+        return ResponseEntity.ok(usuarioRolService.listarTodas());
     }
 
-    // 🔹 Eliminar relación usuario-rol
+    // ====================================================
+    // ELIMINAR relación (solo si quieres borrar físicamente)
+    // ====================================================
     @DeleteMapping("/{idUsuario}/{idRol}")
     public ResponseEntity<Void> eliminar(
             @PathVariable Integer idUsuario,
@@ -52,9 +59,85 @@ public class UsuarioRolController {
 
         try {
             usuarioRolService.eliminar(idUsuario, idRol);
-            return ResponseEntity.noContent().build(); // 204 ok sin contenido
+            return ResponseEntity.noContent().build();
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build(); // 404 si no existe
+            return ResponseEntity.notFound().build();
         }
     }
+
+    // ====================================================
+    // DESACTIVAR relación
+    // ====================================================
+    @PutMapping("/{idUsuario}/{idRol}/desactivar")
+    public ResponseEntity<UsuarioRol> desactivar(
+            @PathVariable Integer idUsuario,
+            @PathVariable Integer idRol) {
+
+        Optional<UsuarioRol> result = usuarioRolService.desactivarRelacion(idUsuario, idRol);
+        return result.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // ====================================================
+    // ACTIVAR relación
+    // ====================================================
+    @PutMapping("/{idUsuario}/{idRol}/activar")
+    public ResponseEntity<UsuarioRol> activar(
+            @PathVariable Integer idUsuario,
+            @PathVariable Integer idRol) {
+
+        Optional<UsuarioRol> result = usuarioRolService.activarRelacion(idUsuario, idRol);
+        return result.map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    // ====================================================
+    // LISTAR roles por usuario (todos)
+    // ====================================================
+    @GetMapping("/usuario/{idUsuario}")
+    public ResponseEntity<List<UsuarioRol>> obtenerRolesPorUsuario(@PathVariable Integer idUsuario) {
+        return ResponseEntity.ok(usuarioRolService.listarRolesPorUsuario(idUsuario));
+    }
+
+    // ====================================================
+    // LISTAR roles ACTIVOS por usuario
+    // ====================================================
+    @GetMapping("/usuario/{idUsuario}/activos")
+    public ResponseEntity<List<UsuarioRol>> obtenerRolesActivosPorUsuario(@PathVariable Integer idUsuario) {
+        return ResponseEntity.ok(usuarioRolService.listarRolesActivosPorUsuario(idUsuario));
+    }
+
+    // ====================================================
+    // LISTAR usuarios por rol (todos)
+    // ====================================================
+    @GetMapping("/rol/{idRol}")
+    public ResponseEntity<List<UsuarioRol>> obtenerUsuariosPorRol(@PathVariable Integer idRol) {
+        return ResponseEntity.ok(usuarioRolService.listarUsuariosPorRol(idRol));
+    }
+
+    // ====================================================
+    // LISTAR usuarios ACTIVOS por rol
+    // ====================================================
+    @GetMapping("/rol/{idRol}/activos")
+    public ResponseEntity<List<UsuarioRol>> obtenerUsuariosActivosPorRol(@PathVariable Integer idRol) {
+        return ResponseEntity.ok(usuarioRolService.listarUsuariosActivosPorRol(idRol));
+    }
+
+    // ====================================================
+    // LISTAR relaciones ACTIVAS
+    // ====================================================
+    @GetMapping("/activos")
+    public ResponseEntity<List<UsuarioRol>> listarActivos() {
+        return ResponseEntity.ok(usuarioRolService.listarActivas());
+    }
+    
+
+    // ====================================================
+    // DTO con detalles (nombre usuario y rol)
+    // ====================================================
+    @GetMapping("rol/detalles")
+    public ResponseEntity<List<UsuarioRolDTO>> listarConDetalles() {
+        return ResponseEntity.ok(usuarioRolService.listarConDetalles());
+    }
+
 }

@@ -1,12 +1,11 @@
 package com.projectBackend.GMotors.model;
 
 import jakarta.persistence.*;
-import java.io.Serializable;
-import java.util.Objects;
+import java.time.LocalDateTime;
 
-@IdClass(UsuarioRol.UsuarioRolId.class)
 @Entity
 @Table(name = "usuario_rol")
+@IdClass(UsuarioRolId.class)
 public class UsuarioRol {
 
     @Id
@@ -17,56 +16,55 @@ public class UsuarioRol {
     @Column(name = "id_rol")
     private Integer idRol;
 
-    public UsuarioRol(){}
+    // RELACIONES
+    @ManyToOne
+    @JoinColumn(name = "id_usuario", insertable = false, updatable = false)
+    private Usuario usuario;
+
+    @ManyToOne
+    @JoinColumn(name = "id_rol", insertable = false, updatable = false)
+    private Rol rol;
+
+    // NUEVAS COLUMNAS
+    @Column(name = "estado", nullable = false)
+    private Integer estado = 1; // 1 = activo, 0 = inactivo
+
+    @Column(name = "fecha_creacion", nullable = false, updatable = false)
+    private LocalDateTime fechaCreacion = LocalDateTime.now();
+
+    @Column(name = "fecha_modificacion")
+    private LocalDateTime fechaModificacion;
+
+    // CONSTRUCTORES
+    public UsuarioRol() {}
 
     public UsuarioRol(Integer idUsuario, Integer idRol) {
         this.idUsuario = idUsuario;
         this.idRol = idRol;
+        this.estado = 1;
+        this.fechaCreacion = LocalDateTime.now();
     }
 
-    public Integer getIdUsuario() {
-        return idUsuario;
+    // GETTERS & SETTERS
+    public Integer getIdUsuario() { return idUsuario; }
+    public void setIdUsuario(Integer idUsuario) { this.idUsuario = idUsuario; }
+
+    public Integer getIdRol() { return idRol; }
+    public void setIdRol(Integer idRol) { this.idRol = idRol; }
+
+    public Usuario getUsuario() { return usuario; }
+    public Rol getRol() { return rol; }
+
+    public Integer getEstado() { return estado; }
+    public void setEstado(Integer estado) { 
+        this.estado = estado; 
+        this.fechaModificacion = LocalDateTime.now();
     }
 
-    public void setIdUsuario(Integer idUsuario) {
-        this.idUsuario = idUsuario;
-    }
+    public LocalDateTime getFechaCreacion() { return fechaCreacion; }
 
-    public Integer getIdRol() {
-        return idRol;
-    }
-
-    public void setIdRol(Integer idRol) {
-        this.idRol = idRol;
-    }
-
-    // -------------------------------
-    // Clase interna para la PK compuesta
-    // -------------------------------
-    public static class UsuarioRolId implements Serializable {
-
-        private Integer idUsuario;
-        private Integer idRol;
-
-        public UsuarioRolId() {}
-
-        public UsuarioRolId(Integer idUsuario, Integer idRol) {
-            this.idUsuario = idUsuario;
-            this.idRol = idRol;
-        }
-
-        @Override
-        public boolean equals(Object o) {
-            if (this == o) return true;
-            if (!(o instanceof UsuarioRolId)) return false;
-            UsuarioRolId that = (UsuarioRolId) o;
-            return Objects.equals(idUsuario, that.idUsuario) &&
-                   Objects.equals(idRol, that.idRol);
-        }
-
-        @Override
-        public int hashCode() {
-            return Objects.hash(idUsuario, idRol);
-        }
+    public LocalDateTime getFechaModificacion() { return fechaModificacion; }
+    public void setFechaModificacion(LocalDateTime fechaModificacion) {
+        this.fechaModificacion = fechaModificacion;
     }
 }

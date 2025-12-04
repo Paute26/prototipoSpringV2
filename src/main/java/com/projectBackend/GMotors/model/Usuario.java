@@ -1,5 +1,7 @@
 package com.projectBackend.GMotors.model;
 
+import java.util.List;
+
 import jakarta.persistence.*;
 
 @Entity
@@ -7,6 +9,7 @@ import jakarta.persistence.*;
 public class Usuario {
 
     @Id
+    @Column(name = "id_usuario")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id_usuario;
 
@@ -18,6 +21,10 @@ public class Usuario {
     private String ciudad;
     private String descripcion;
     private String ruta_imagen;    
+    
+    // Relación con UsuarioRol
+    @OneToMany(mappedBy = "usuario")
+    private List<UsuarioRol> roles;  // lista de roles asignados
     
     //COSTRUCTORES
     public Usuario() {}  
