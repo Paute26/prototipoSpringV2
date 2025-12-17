@@ -41,6 +41,7 @@ public class MotoService {
 		motoDB.setModelo(motoActualizada.getModelo());
 		motoDB.setKilometraje(motoActualizada.getKilometraje());
 		motoDB.setCilindraje(motoActualizada.getCilindraje());
+		motoDB.setruta_imagenMotos(motoActualizada.getruta_imagenMotos());
 		motoDB.setId_usuario(motoActualizada.getId_usuario());
 		return motoRepository.save(motoDB);
 	}

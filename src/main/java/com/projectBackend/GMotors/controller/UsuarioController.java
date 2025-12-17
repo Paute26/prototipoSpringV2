@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.projectBackend.GMotors.config.JwtUtil;
 import com.projectBackend.GMotors.dto.AuthResponse;
@@ -12,6 +13,7 @@ import com.projectBackend.GMotors.service.UsuarioService;
 
 import java.util.List;
 import java.util.Optional;
+import java.nio.file.*;
 
 
 @RestController
@@ -104,4 +106,35 @@ public class UsuarioController {
         }
     }
 
+    // --------------------- Subir Imagen ---------------------
+    
+    @PostMapping("/upload")
+    public ResponseEntity<String> subirImagen(@RequestParam("file") MultipartFile file) {
+        try {
+            // Carpeta donde se guardarán las imágenes
+        	String carpeta = "src/main/resources/static/images/";
+            Path carpetaPath = Paths.get(carpeta);
+            if (!Files.exists(carpetaPath)) {
+                Files.createDirectories(carpetaPath);
+            }
+
+            // Nombre único
+            String nombreArchivo = System.currentTimeMillis() + "_" + file.getOriginalFilename();
+            Path rutaArchivo = carpetaPath.resolve(nombreArchivo);
+
+            // Guardar archivo
+            Files.write(rutaArchivo, file.getBytes());
+
+            // URL que se guardará en la base de datos
+            String urlImagen = "http://localhost:8080/images/" + nombreArchivo;
+
+            return ResponseEntity.ok(urlImagen);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                                 .body("Error al subir la imagen");
+        }
+    }
+   
 }

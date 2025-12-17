@@ -39,20 +39,31 @@ public class UsuarioService {
 	}
 
 	// Modificar Usuario
-	public Usuario actualizarUsuario(Long id, Usuario usuarioActualizado) {
-		// ✅ Usa .orElseThrow() → devuelve Usuario directamente
-		Usuario usuarioExistente = usuarioRepository.findById(id)
-				.orElseThrow(() -> new RuntimeException("Usuario con ID " + id + " no encontrado"));
+    public Usuario actualizarUsuario(Long id, Usuario usuarioActualizado) {
+        Usuario usuarioExistente = usuarioRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Usuario con ID " + id + " no encontrado"));
 
-		// Ahora sí: usuarioExistente es de tipo Usuario (no Optional)
-		// Actualización de los campos
-        usuarioExistente.setNombre_completo(usuarioActualizado.getNombre_completo());
-        usuarioExistente.setNombre_usuario(usuarioActualizado.getNombre_usuario());
-        usuarioExistente.setCorreo(usuarioActualizado.getCorreo());
-        usuarioExistente.setPais(usuarioActualizado.getPais());
-        usuarioExistente.setCiudad(usuarioActualizado.getCiudad());
-        usuarioExistente.setDescripcion(usuarioActualizado.getDescripcion());
-        usuarioExistente.setRutaimagen(usuarioActualizado.getRutaimagen());
+        if (usuarioActualizado.getNombre_completo() != null) {
+            usuarioExistente.setNombre_completo(usuarioActualizado.getNombre_completo());
+        }
+        if (usuarioActualizado.getNombre_usuario() != null) {
+            usuarioExistente.setNombre_usuario(usuarioActualizado.getNombre_usuario());
+        }
+        if (usuarioActualizado.getCorreo() != null) {
+            usuarioExistente.setCorreo(usuarioActualizado.getCorreo());
+        }
+        if (usuarioActualizado.getPais() != null) {
+            usuarioExistente.setPais(usuarioActualizado.getPais());
+        }
+        if (usuarioActualizado.getCiudad() != null) {
+            usuarioExistente.setCiudad(usuarioActualizado.getCiudad());
+        }
+        if (usuarioActualizado.getDescripcion() != null) {
+            usuarioExistente.setDescripcion(usuarioActualizado.getDescripcion());
+        }
+        if (usuarioActualizado.getRutaimagen() != null) {
+            usuarioExistente.setRutaimagen(usuarioActualizado.getRutaimagen());
+        }
         
      // Si envían nueva contraseña → encriptar
         if (usuarioActualizado.getContrasena() != null && !usuarioActualizado.getContrasena().isBlank()) {
