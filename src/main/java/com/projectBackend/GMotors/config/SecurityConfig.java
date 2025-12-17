@@ -40,6 +40,7 @@ public class SecurityConfig {
                 //   RUTAS PROTEGIDAS
                 // ============================
                 .requestMatchers("/api/usuarios/**").authenticated()
+                .requestMatchers("/api/motos/**").authenticated()
 
                 // Cualquier otra ruta, requiere token
                 .anyRequest().authenticated()

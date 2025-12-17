@@ -13,10 +13,15 @@ public class Moto {
 	private Integer anio;
 	private String marca;
 	private String modelo;
+	
+	@Column(name = "tipo_moto")
+	private String tipoMoto;
 	private Integer kilometraje;
 	private Integer cilindraje;
 	private Long id_usuario;
-	private String ruta_imagenMotos;
+	
+	@Column(name = "ruta_imagen_motos")
+	private String ruta_imagenMotos;  
 	
 	// ==========================
 	// CONSTRUCTORES
@@ -25,7 +30,7 @@ public class Moto {
 	}
 
 	public Moto(Long id_moto, String placa, Integer anio, String marca, String modelo, Integer kilometraje,
-			Integer cilindraje, Long id_usuario, String ruta_imagenMotos) {
+			Integer cilindraje, Long id_usuario, String tipoMoto, String ruta_imagenMotos) {
 		super();
 		this.id_moto = id_moto;
 		this.placa = placa;
@@ -34,6 +39,7 @@ public class Moto {
 		this.modelo = modelo;
 		this.kilometraje = kilometraje;
 		this.cilindraje = cilindraje;
+		this.tipoMoto = tipoMoto;
 		this.id_usuario = id_usuario;
 		this.ruta_imagenMotos = ruta_imagenMotos;
 	}
@@ -56,11 +62,19 @@ public class Moto {
 		this.placa = placa;
 	}
 	
-	public String getruta_imagenMotos() {
+	public String getTipoMoto() {
+		return tipoMoto;
+	}
+
+	public void setTipoMoto(String tipoMoto) {
+		this.tipoMoto = tipoMoto;
+	}
+	
+	public String getRuta_imagenMotos() {
 		return ruta_imagenMotos;
 	}
 
-	public void setruta_imagenMotos(String ruta_imagenMotos) {
+	public void setRuta_imagenMotos(String ruta_imagenMotos) {
 		this.ruta_imagenMotos = ruta_imagenMotos;
 	}
 
