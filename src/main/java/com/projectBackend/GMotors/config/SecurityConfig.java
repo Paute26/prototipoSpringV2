@@ -35,6 +35,7 @@ public class SecurityConfig {
                 // ============================
                 .requestMatchers("/api/usuarios/login").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/usuarios").permitAll() // Registro
+                .requestMatchers("/images/**").permitAll()
 
                 // ============================
                 //   RUTAS PROTEGIDAS

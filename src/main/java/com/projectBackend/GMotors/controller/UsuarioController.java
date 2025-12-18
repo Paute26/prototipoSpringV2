@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import jakarta.servlet.http.HttpServletRequest;
 
 import com.projectBackend.GMotors.config.JwtUtil;
 import com.projectBackend.GMotors.dto.AuthResponse;
@@ -109,31 +110,41 @@ public class UsuarioController {
     // --------------------- Subir Imagen ---------------------
     
     @PostMapping("/upload")
-    public ResponseEntity<String> subirImagen(@RequestParam("file") MultipartFile file) {
+    public ResponseEntity<String> subirImagen(
+            @RequestParam("file") MultipartFile file,
+            HttpServletRequest request
+    ) {
         try {
-            // Carpeta donde se guardarán las imágenes
-        	String carpeta = "src/main/resources/static/images/";
+            // Carpeta física
+            String carpeta = "C:/Users/USUARIO/Desktop/prototipoSpring/gmotors/uploads/usuarios/";
             Path carpetaPath = Paths.get(carpeta);
+
             if (!Files.exists(carpetaPath)) {
                 Files.createDirectories(carpetaPath);
             }
 
-            // Nombre único
+            // Nombre único del archivo
             String nombreArchivo = System.currentTimeMillis() + "_" + file.getOriginalFilename();
             Path rutaArchivo = carpetaPath.resolve(nombreArchivo);
 
             // Guardar archivo
-            Files.write(rutaArchivo, file.getBytes());
+            Files.copy(file.getInputStream(), rutaArchivo, StandardCopyOption.REPLACE_EXISTING);
 
-            // URL que se guardará en la base de datos
-            String urlImagen = "http://localhost:8080/images/" + nombreArchivo;
+            // Detecta automáticamente host + puerto
+            String baseUrl =
+                    request.getScheme() + "://" +
+                    request.getServerName() + ":" +
+                    request.getServerPort();
+
+            String urlImagen = baseUrl + "/images/usuarios/" + nombreArchivo;
 
             return ResponseEntity.ok(urlImagen);
 
         } catch (Exception e) {
             e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                                 .body("Error al subir la imagen");
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al subir la imagen");
         }
     }
    

@@ -37,8 +37,9 @@ public class JwtFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
 
         // Rutas públicas
-        if (path.equals("/api/usuarios/login") ||
-                (path.equals("/api/usuarios") && request.getMethod().equals("POST"))) {
+        if (path.startsWith("/images/") ||
+            path.equals("/api/usuarios/login") ||
+            (path.equals("/api/usuarios") && request.getMethod().equals("POST"))) {
 
             filterChain.doFilter(request, response);
             return;
