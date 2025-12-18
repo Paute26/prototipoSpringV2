@@ -29,6 +29,12 @@ public class MotoService {
 	public List<Moto> listarTodas() {
 		return motoRepository.findAll();
 	}
+	
+    // Listar motos de un usuario
+    public List<Moto> listarPorUsuario(Long idUsuario) {
+        return motoRepository.findByUsuarioId(idUsuario);
+    }
+
 
 	// Actualizar moto
 	public Moto actualizarMoto(Long id, Moto motoActualizada) {

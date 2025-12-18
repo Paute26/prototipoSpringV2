@@ -49,6 +49,15 @@ public class MotoController {
     public List<Moto> listarTodas() {
         return motoService.listarTodas();
     }
+    
+    // ======================================================
+    // LISTAR MOTOS POR USUARIO
+    // ======================================================
+    
+    @GetMapping("/usuario/{idUsuario}")
+    public List<Moto> listarMotosPorUsuario(@PathVariable Long idUsuario) {
+        return motoService.listarPorUsuario(idUsuario);
+    }
 
     // ======================================================
     // ACTUALIZAR MOTO
