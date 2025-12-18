@@ -123,7 +123,7 @@ public class UsuarioController {
                 Files.createDirectories(carpetaPath);
             }
 
-            // Nombre único del archivo
+            // Nombre del archivo
             String nombreArchivo = System.currentTimeMillis() + "_" + file.getOriginalFilename();
             Path rutaArchivo = carpetaPath.resolve(nombreArchivo);
 

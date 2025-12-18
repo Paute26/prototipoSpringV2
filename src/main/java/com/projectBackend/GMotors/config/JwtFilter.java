@@ -14,7 +14,7 @@ import java.util.List;
 
 
 
-// Spring intercepta cada request, extrae el token y valida.
+
 @Component
 public class JwtFilter extends OncePerRequestFilter {
 

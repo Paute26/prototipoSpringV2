@@ -15,5 +15,12 @@ public class WebConfig implements WebMvcConfigurer {
                     "file:C:/Users/USUARIO/Desktop/prototipoSpring/gmotors/uploads/usuarios/"
                 )
                 .setCachePeriod(0);
+        
+        
+        registry.addResourceHandler("/images/motos/**")
+                .addResourceLocations(
+                    "file:C:/Users/USUARIO/Desktop/prototipoSpring/gmotors/uploads/motos/"
+                )
+                .setCachePeriod(0);
     }
 }
