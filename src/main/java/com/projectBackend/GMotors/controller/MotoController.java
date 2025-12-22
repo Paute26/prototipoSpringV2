@@ -1,6 +1,7 @@
 package com.projectBackend.GMotors.controller;
 
 
+import com.projectBackend.GMotors.config.FlaskOcrClient;
 import com.projectBackend.GMotors.model.Moto;
 import com.projectBackend.GMotors.service.MotoService;
 
@@ -17,6 +18,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -25,6 +27,9 @@ public class MotoController {
 
     @Autowired
     private MotoService motoService;
+    
+    @Autowired
+    private FlaskOcrClient flaskOcrClient;
 
     // ======================================================
     // CREAR MOTO
@@ -67,6 +72,69 @@ public class MotoController {
         return motoService.actualizarMoto(id, motoActualizada);
     }
     
+ // ======================================================
+    // DETECTAR PLACA CON OCR 
+    // ======================================================
+    
+    @PostMapping("/ocr/placa")
+    public ResponseEntity<Map<String, String>> detectarPlaca(
+            @RequestParam("image") MultipartFile image
+    ) {
+        try {
+            System.out.println("[CONTROLLER] Recibiendo imagen para OCR...");
+            System.out.println("[CONTROLLER] Nombre: " + image.getOriginalFilename());
+            System.out.println("[CONTROLLER] Tamaño: " + image.getSize() + " bytes");
+            
+            // Consumir Flask OCR
+            String placaDetectada = flaskOcrClient.detectarPlaca(image);
+
+            if (placaDetectada == null || placaDetectada.isBlank()) {
+                System.out.println("❌ [CONTROLLER] No se detectó placa");
+                return ResponseEntity.ok(Map.of("placa", ""));
+            }
+
+            System.out.println("✅ [CONTROLLER] Placa detectada: " + placaDetectada);
+            return ResponseEntity.ok(Map.of("placa", placaDetectada));
+
+        } catch (Exception e) {
+            System.err.println("❌ [CONTROLLER] Error en OCR:");
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("placa", "", "error", e.getMessage()));
+        }
+    }
+    
+    
+    // ======================================================
+    // ACTUALIZAR PLACA CON OCR (FLASK)
+    // ======================================================
+    
+    @PostMapping("/{id}/ocr-placa")
+    public ResponseEntity<Moto> actualizarPlacaConOCR(
+            @PathVariable Long id,
+            @RequestParam("image") MultipartFile image
+    ) {
+        try {
+            // Consumir Flask OCR
+            String placaDetectada = flaskOcrClient.detectarPlaca(image);
+
+            if (placaDetectada == null || placaDetectada.isBlank()) {
+                return ResponseEntity.badRequest().build();
+            }
+
+            // Reutilizar el service existente
+            Moto patch = new Moto();
+            patch.setPlaca(placaDetectada);
+
+            Moto motoActualizada = motoService.actualizarMoto(id, patch);
+
+            return ResponseEntity.ok(motoActualizada);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.internalServerError().build();
+        }
+    }
     
     // ======================================================
     // SUBIR FOTO MOTO

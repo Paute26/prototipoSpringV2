@@ -39,7 +39,8 @@ public class JwtFilter extends OncePerRequestFilter {
         // Rutas públicas
         if (path.startsWith("/images/") ||
             path.equals("/api/usuarios/login") ||
-            (path.equals("/api/usuarios") && request.getMethod().equals("POST"))) {
+            (path.equals("/api/usuarios") && request.getMethod().equals("POST")) ||
+            (path.equals("/api/motos/ocr/placa") && request.getMethod().equals("POST"))) {
 
             filterChain.doFilter(request, response);
             return;
