@@ -15,6 +15,7 @@ public class Producto {
     private String codigo_personal;
     private String nombre;
     private String descripcion;
+    private String ruta_imagenproductos;
 
     private Double costo;
     private Double pvp;
@@ -43,6 +44,16 @@ public class Producto {
     public void setCodigo_proveedor(String codigo_proveedor) {
         this.codigo_proveedor = codigo_proveedor;
     }
+    
+    
+    public String getruta_imagenproductos() {
+        return ruta_imagenproductos;
+    }
+
+    public void setruta_imagenproductos(String ruta_imagenproductos) {
+        this.ruta_imagenproductos = ruta_imagenproductos;
+    }
+    
 
     public String getCodigo_personal() {
         return codigo_personal;

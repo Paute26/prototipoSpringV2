@@ -45,7 +45,9 @@ public class ProductoService {
             existing.setStock(producto.getStock());
             existing.setCodigo_personal(producto.getCodigo_personal());
             existing.setCodigo_proveedor(producto.getCodigo_proveedor());
+            existing.setruta_imagenproductos(producto.getruta_imagenproductos());
             existing.setPvp(producto.getPvp());
+            
 
             // IMPORTANTE:
             existing.setFecha_modificacion(LocalDate.now());
