@@ -121,10 +121,4 @@ public class Producto {
     public void setId_categoria(Long id_categoria) {
         this.id_categoria = id_categoria;
     }
-    public String getruta_imagenproductos() {
-        return ruta_imagenproductos;
-    }
-    public void setruta_imagenproductos(String ruta_imagenproductos) {
-        this.ruta_imagenproductos = ruta_imagenproductos;
-    }
 }

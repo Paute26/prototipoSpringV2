@@ -93,11 +93,11 @@ public class Moto {
 	}
 	
 	public String getRuta_imagenMotos() {
-		return ruta_imagenMotos;
+		return rutaImagenMotos;
 	}
 
 	public void setRuta_imagenMotos(String ruta_imagenMotos) {
-		this.ruta_imagenMotos = ruta_imagenMotos;
+		this.rutaImagenMotos = ruta_imagenMotos;
 	}
 
 	public Integer getAnio() {
@@ -146,14 +146,6 @@ public class Moto {
 
 	public void setRutaImagenMotos(String rutaImagenMotos) {
 		this.rutaImagenMotos = rutaImagenMotos != null ? rutaImagenMotos : "Desconocido";
-	}
-
-	public String getTipoMoto() {
-		return tipoMoto;
-	}
-
-	public void setTipoMoto(String tipoMoto) {
-		this.tipoMoto = tipoMoto;
 	}
 
 	public Long getId_usuario() {

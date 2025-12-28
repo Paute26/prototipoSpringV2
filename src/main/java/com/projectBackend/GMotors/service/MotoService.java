@@ -82,34 +82,6 @@ public class MotoService {
 	    return motoRepository.save(motoDB);
 	}
 
-        // Actualizar campos (solo si no son null)
-        if (motoActualizada.getPlaca() != null) {
-            motoDB.setPlaca(motoActualizada.getPlaca());
-        }
-        if (motoActualizada.getAnio() != null) {
-            motoDB.setAnio(motoActualizada.getAnio());
-        }
-        if (motoActualizada.getMarca() != null) {
-            motoDB.setMarca(motoActualizada.getMarca());
-        }
-        if (motoActualizada.getModelo() != null) {
-            motoDB.setModelo(motoActualizada.getModelo());
-        }
-        if (motoActualizada.getKilometraje() != null) {
-            motoDB.setKilometraje(motoActualizada.getKilometraje());
-        }
-        if (motoActualizada.getCilindraje() != null) {
-            motoDB.setCilindraje(motoActualizada.getCilindraje());
-        }
-        if (motoActualizada.getTipoMoto() != null) {
-            motoDB.setTipoMoto(motoActualizada.getTipoMoto());
-        }
-        if (motoActualizada.getRutaImagenMotos() != null) {
-            motoDB.setRutaImagenMotos(motoActualizada.getRutaImagenMotos());
-        }
-
-        return motoRepository.save(motoDB);
-    }
 
     // ✅ Eliminar moto
     @Transactional
