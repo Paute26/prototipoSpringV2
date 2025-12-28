@@ -1,36 +1,71 @@
 package com.projectBackend.GMotors.service;
 
+import com.projectBackend.GMotors.dto.DetalleFacturaCreateDTO;
+import com.projectBackend.GMotors.model.DetalleFactura;
 import com.projectBackend.GMotors.model.Factura;
+import com.projectBackend.GMotors.repository.DetalleFacturaRepository;
 import com.projectBackend.GMotors.repository.FacturaRepository;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class FacturaService {
 
-    @Autowired
-    private FacturaRepository facturaRepository;
+    private final FacturaRepository facturaRepository;
+    private final DetalleFacturaRepository detalleFacturaRepository;
+    private final DetalleFacturaService detalleFacturaService;
 
-    // Listar todas las facturas
-    public List<Factura> findAll() {
-        return facturaRepository.findAll();
+    public FacturaService(
+            FacturaRepository facturaRepository,
+            DetalleFacturaRepository detalleFacturaRepository,
+            DetalleFacturaService detalleFacturaService
+    ) {
+        this.facturaRepository = facturaRepository;
+        this.detalleFacturaRepository = detalleFacturaRepository;
+        this.detalleFacturaService = detalleFacturaService;
     }
 
-    // Buscar factura por ID
-    public Optional<Factura> findById(Long id) {
-        return facturaRepository.findById(id);
-    }
+    @Transactional
+    public Factura crearFactura(
+            List<DetalleFacturaCreateDTO> detallesDTO,
+            Long idUsuarioCliente
+    ) {
+    	//Recibe la lista de detalls y el ID del cliente
+        
+    	if (detallesDTO == null || detallesDTO.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "La factura debe contener al menos un detalle"
+            );
+        }
+        
 
-    // Crear o actualizar factura
-    public Factura save(Factura factura) {
+        // 1️⃣ Crear factura base
+        Factura factura = new Factura();
+        factura.setCostoTotal(BigDecimal.ZERO);
+        factura.setFechaEmision(LocalDate.now()); // ✅ solo fecha del Server
+        factura.setIdUsuario(idUsuarioCliente); // ✅ Ya esta validado en RegistroService
+        factura = facturaRepository.save(factura);
+
+        BigDecimal totalFactura = BigDecimal.ZERO;
+
+        // 2️⃣ Crear y guardar detalles
+        for (DetalleFacturaCreateDTO dto : detallesDTO) {
+
+            DetalleFactura detalle =
+                    detalleFacturaService.crearDetalle(dto, factura);
+
+            detalleFacturaRepository.save(detalle);
+
+            totalFactura = totalFactura.add(detalle.getSubtotal());
+        }
+
+        // 3️⃣ Actualizar total factura
+        factura.setCostoTotal(totalFactura);
         return facturaRepository.save(factura);
-    }
-
-    // Eliminar factura por ID
-    public void deleteById(Long id) {
-        facturaRepository.deleteById(id);
     }
 }

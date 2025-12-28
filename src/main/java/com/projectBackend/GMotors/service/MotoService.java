@@ -2,41 +2,51 @@ package com.projectBackend.GMotors.service;
 
 import java.util.List;
 import java.util.Optional;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.projectBackend.GMotors.model.Moto;
 import com.projectBackend.GMotors.repository.MotoRepository;
+import com.projectBackend.GMotors.repository.UsuarioRepository;
 
 @Service
 public class MotoService {
 
-	@Autowired
-	private MotoRepository motoRepository;
+    @Autowired
+    private MotoRepository motoRepository;
+    
+    @Autowired
+    private UsuarioRepository usuarioRepository;
 
-	// Crear moto
-	public Moto crearMoto(Moto moto) {
-		return motoRepository.save(moto);
-	}
+    // ✅ Crear moto (CON validación de usuario)
+    @Transactional
+    public Moto crearMoto(Moto moto) {
+        // Validar que el usuario exista antes de crear la moto
+        if (!usuarioRepository.existsById(moto.getId_usuario())) {
+            throw new RuntimeException("Usuario no encontrado con ID: " + moto.getId_usuario());
+        }
+        return motoRepository.save(moto);
+    }
 
-	// Buscar moto por ID
-	public Optional<Moto> buscarPorId(Long id) {
-		return motoRepository.findById(id);
-	}
+    // ✅ Buscar moto por ID
+    public Optional<Moto> buscarPorId(Long id) {
+        return motoRepository.findById(id);
+    }
 
 	// Listar todas las motos
 	public List<Moto> listarTodas() {
 		return motoRepository.findAll();
 	}
 	
-    // Listar motos de un usuario
+    // ✅ Listar motos de un usuario
     public List<Moto> listarPorUsuario(Long idUsuario) {
-        return motoRepository.findByUsuarioId(idUsuario);
+        return motoRepository.findByIdUsuario(idUsuario);
     }
 
 
 	// Actualizar moto
+    @Transactional
 	public Moto actualizarMoto(Long id, Moto motoActualizada) {
 	    Moto motoDB = motoRepository.findById(id)
 	        .orElseThrow(() -> new RuntimeException("Moto no encontrada con ID: " + id));
@@ -72,4 +82,41 @@ public class MotoService {
 	    return motoRepository.save(motoDB);
 	}
 
+        // Actualizar campos (solo si no son null)
+        if (motoActualizada.getPlaca() != null) {
+            motoDB.setPlaca(motoActualizada.getPlaca());
+        }
+        if (motoActualizada.getAnio() != null) {
+            motoDB.setAnio(motoActualizada.getAnio());
+        }
+        if (motoActualizada.getMarca() != null) {
+            motoDB.setMarca(motoActualizada.getMarca());
+        }
+        if (motoActualizada.getModelo() != null) {
+            motoDB.setModelo(motoActualizada.getModelo());
+        }
+        if (motoActualizada.getKilometraje() != null) {
+            motoDB.setKilometraje(motoActualizada.getKilometraje());
+        }
+        if (motoActualizada.getCilindraje() != null) {
+            motoDB.setCilindraje(motoActualizada.getCilindraje());
+        }
+        if (motoActualizada.getTipoMoto() != null) {
+            motoDB.setTipoMoto(motoActualizada.getTipoMoto());
+        }
+        if (motoActualizada.getRutaImagenMotos() != null) {
+            motoDB.setRutaImagenMotos(motoActualizada.getRutaImagenMotos());
+        }
+
+        return motoRepository.save(motoDB);
+    }
+
+    // ✅ Eliminar moto
+    @Transactional
+    public void eliminarMoto(Long id) {
+        if (!motoRepository.existsById(id)) {
+            throw new RuntimeException("Moto no encontrada con ID: " + id);
+        }
+        motoRepository.deleteById(id);
+    }
 }
