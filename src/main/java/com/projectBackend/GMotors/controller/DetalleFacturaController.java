@@ -2,48 +2,30 @@ package com.projectBackend.GMotors.controller;
 
 import com.projectBackend.GMotors.model.DetalleFactura;
 import com.projectBackend.GMotors.service.DetalleFacturaService;
-
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Optional;
 
 @RestController
-@RequestMapping("/api/detalles-factura")
+@RequestMapping("/detalles-factura")
 public class DetalleFacturaController {
 
-    @Autowired
-    private DetalleFacturaService detalleFacturaService;
+    private final DetalleFacturaService detalleFacturaService;
 
-    // Listar todos los detalles
-    @GetMapping
-    public List<DetalleFactura> listarTodos() {
-        return detalleFacturaService.findAll();
+    public DetalleFacturaController(DetalleFacturaService detalleFacturaService) {
+        this.detalleFacturaService = detalleFacturaService;
     }
 
-    // Buscar detalle por ID
-    @GetMapping("/{id}")
-    public Optional<DetalleFactura> buscarPorId(@PathVariable Long id) {
-        return detalleFacturaService.findById(id);
-    }
+    // ================= CREAR DETALLE =================
+    // LOGICA MANEJADA EN REGISTROCONTROLLER
 
-    // Crear nuevo detalle
-    @PostMapping
-    public DetalleFactura crear(@RequestBody DetalleFactura detalleFactura) {
-        return detalleFacturaService.save(detalleFactura);
-    }
+    // ================= OBTENER DETALLES POR FACTURA =================
+    //Logica descontinuad, si se necesita se debe de implementar en DetalleFactura service
 
-    // Actualizar detalle
-    @PutMapping("/{id}")
-    public DetalleFactura actualizar(@PathVariable Long id, @RequestBody DetalleFactura detalleFactura) {
-        detalleFactura.setId_detalle(id);
-        return detalleFacturaService.save(detalleFactura);
-    }
 
-    // Eliminar detalle por ID
-    @DeleteMapping("/{id}")
-    public void eliminar(@PathVariable Long id) {
-        detalleFacturaService.deleteById(id);
-    }
+    // ================= ELIMINAR DETALLES POR FACTURA =================
+    //Logica descontinuad, si se necesita se debe de implementar en DetalleFactura service
+
 }

@@ -1,61 +1,96 @@
 package com.projectBackend.GMotors.controller;
 
+import com.projectBackend.GMotors.dto.RegistroCreateDTO;
+import com.projectBackend.GMotors.dto.RegistroListadoDTO;
 import com.projectBackend.GMotors.model.Registro;
 import com.projectBackend.GMotors.service.RegistroService;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import java.util.List;
+import java.util.Map;
+
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
-
 @RestController
 @RequestMapping("/api/registros")
-@CrossOrigin(origins = "*")
 public class RegistroController {
 
-    @Autowired
-    private RegistroService registroService;
+    private final RegistroService registroService;
 
-    // ===================== LISTAR =====================
-    @GetMapping
-    public List<Registro> listarTodos() {
-        return registroService.listarTodos();
+    public RegistroController(RegistroService registroService) {
+        this.registroService = registroService;
     }
-
-    // ===================== BUSCAR POR ID =====================
-    @GetMapping("/{id}")
-    public ResponseEntity<Registro> obtenerPorId(@PathVariable Long id) {
-        return registroService.buscarPorId(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
-    }
-
-    // ===================== CREAR =====================
+    
+    // ✅ Crear registro (factura + detalles incluidos)
     @PostMapping
-    public ResponseEntity<Registro> crearRegistro(@RequestBody Registro registro) {
-        Registro nuevo = registroService.crearRegistro(registro);
-        return ResponseEntity.ok(nuevo);
-    }
-
-    // ===================== ACTUALIZAR =====================
-    @PutMapping("/{id}")
-    public ResponseEntity<Registro> actualizarRegistro(
-            @PathVariable Long id,
-            @RequestBody Registro registroActualizado) {
-
+    public ResponseEntity<?> crearRegistro(
+            @RequestBody RegistroCreateDTO dto
+    ) {
         try {
-            Registro actualizado = registroService.actualizarRegistro(id, registroActualizado);
-            return ResponseEntity.ok(actualizado);
+            Registro registro = registroService.crearRegistro(dto);
+            return ResponseEntity
+                    .status(HttpStatus.CREATED)
+                    .body(registro);
+
+        } catch (IllegalArgumentException e) {
+            // Errores de validación de negocio
+            return ResponseEntity
+                    .status(HttpStatus.BAD_REQUEST)
+                    .body(e.getMessage());
+
         } catch (RuntimeException e) {
-            return ResponseEntity.notFound().build();
+            // Entidades no encontradas u otros errores controlados
+            return ResponseEntity
+                    .status(HttpStatus.NOT_FOUND)
+                    .body(e.getMessage());
+
+        } catch (Exception e) {
+            // Error inesperado
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error al crear el registro");
         }
     }
-
-    // ===================== ELIMINAR =====================
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> eliminarRegistro(@PathVariable Long id) {
-        registroService.eliminarRegistro(id);
-        return ResponseEntity.noContent().build();
+    
+    @PostMapping("/test")
+    public ResponseEntity<?> test(@RequestBody Map<String, Object> body) {
+        System.out.println("BODY = " + body);
+        return ResponseEntity.ok(body);
     }
+
+    
+  //ControllerREG
+ // ================= LISTAR TODOS =================
+     @GetMapping
+     public ResponseEntity<List<RegistroListadoDTO>> listarTodos() {
+         return ResponseEntity.ok(registroService.listarTodos());
+     }
+
+     // ================= LISTAR POR CLIENTE =================
+     @GetMapping("/cliente/{idCliente}")
+     public ResponseEntity<List<RegistroListadoDTO>> listarPorCliente(
+             @PathVariable Long idCliente
+     ) {
+         return ResponseEntity.ok(
+                 registroService.listarPorCliente(idCliente)
+         );
+     }
+
+     // ================= LISTAR POR ENCARGADO =================
+     @GetMapping("/encargado/{idEncargado}")
+     public ResponseEntity<List<RegistroListadoDTO>> listarPorEncargado(
+             @PathVariable Long idEncargado
+     ) {
+         return ResponseEntity.ok(
+                 registroService.listarPorEncargado(idEncargado)
+         );
+     }
+     
+     @GetMapping("/{id}")
+     public RegistroListadoDTO obtenerDetalle(@PathVariable Long id) {
+         return registroService.obtenerDetalle(id);
+     }
+     
+
 }
