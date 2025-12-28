@@ -1,6 +1,8 @@
 package com.projectBackend.GMotors.model;
 
 import jakarta.persistence.*;
+
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -17,9 +19,12 @@ public class Producto {
     private String descripcion;
     private String ruta_imagenproductos;
 
-    private Double costo;
-    private Double pvp;
+    @Column(name = "costo", precision = 10, scale = 2, nullable = false)
+    private BigDecimal costo;
 
+    @Column(name = "pvp", precision = 10, scale = 2, nullable = false)
+    private BigDecimal pvp;
+    
     private Integer stock;
 
     private LocalDate fecha_registro;
@@ -78,22 +83,12 @@ public class Producto {
     public void setDescripcion(String descripcion) {
         this.descripcion = descripcion;
     }
+    
+    public BigDecimal getCosto() { return costo; }
+    public void setCosto(BigDecimal costo) { this.costo = costo; }
 
-    public Double getCosto() {
-        return costo;
-    }
-
-    public void setCosto(Double costo) {
-        this.costo = costo;
-    }
-
-    public Double getPvp() {
-        return pvp;
-    }
-
-    public void setPvp(Double pvp) {
-        this.pvp = pvp;
-    }
+    public BigDecimal getPvp() { return pvp; }
+    public void setPvp(BigDecimal pvp) { this.pvp = pvp; }
 
     public Integer getStock() {
         return stock;
@@ -125,5 +120,11 @@ public class Producto {
 
     public void setId_categoria(Long id_categoria) {
         this.id_categoria = id_categoria;
+    }
+    public String getruta_imagenproductos() {
+        return ruta_imagenproductos;
+    }
+    public void setruta_imagenproductos(String ruta_imagenproductos) {
+        this.ruta_imagenproductos = ruta_imagenproductos;
     }
 }

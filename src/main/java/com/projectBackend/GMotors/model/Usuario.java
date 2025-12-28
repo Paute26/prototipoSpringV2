@@ -11,7 +11,7 @@ public class Usuario {
     @Id
     @Column(name = "id_usuario")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_usuario;
+    private Long idUsuario;
 
     private String nombre_completo;
     private String nombre_usuario;
@@ -32,7 +32,7 @@ public class Usuario {
 	public Usuario(Long id_usuario, String nombre_completo, String nombre_usuario, String correo, String contrasena,
 			String pais, String ciudad, String descripcion, String ruta_imagen) {
 		super();
-		this.id_usuario = id_usuario;
+		this.idUsuario = id_usuario;
 		this.nombre_completo = nombre_completo;
 		this.nombre_usuario = nombre_usuario;
 		this.correo = correo;
@@ -43,8 +43,6 @@ public class Usuario {
 		this.ruta_imagen = ruta_imagen;
 	}
 
-
-
 	// =====================
     // Getters y Setters
     // =====================
@@ -54,11 +52,11 @@ public class Usuario {
 	}
 
 	public Long getId_usuario() {
-		return id_usuario;
+		return idUsuario;
 	}
 
 	public void setId_usuario(Long id_usuario) {
-		this.id_usuario = id_usuario;
+		this.idUsuario = id_usuario;
 	}
 
 	public String getNombre_completo() {

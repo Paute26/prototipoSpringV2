@@ -3,26 +3,46 @@ package com.projectBackend.GMotors.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "motos")
+@Table(name = "motos", uniqueConstraints = @UniqueConstraint(columnNames = "placa"))
 public class Moto {
-	
+
 	@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_moto;
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	@Column(name = "id_moto")
+	private Long idMoto;
+
+	@Column(nullable = false, length = 20)
 	private String placa;
+
+	@Column(nullable = false)
 	private Integer anio;
+
+	@Column(nullable = false, length = 100)
 	private String marca;
+
+	@Column(nullable = false, length = 100)
 	private String modelo;
-	
-	@Column(name = "tipo_moto")
+
+	@Column(name = "tipo_moto", nullable = false, length = 255)
 	private String tipoMoto;
+	
+	@Column(nullable = false)
 	private Integer kilometraje;
+
+	@Column(nullable = false)
 	private Integer cilindraje;
-	private Long id_usuario;
 	
-	@Column(name = "ruta_imagen_motos")
-	private String ruta_imagenMotos;  
-	
+	@Column(name = "id_usuario", nullable = false)
+	private Long idUsuario;
+
+
+	// ==========================
+	// ✅ NUEVA COLUMNA (faltaban)
+	// ==========================
+
+	@Column(name = "ruta_imagen_motos", nullable = false, length = 255)
+	private String rutaImagenMotos = "Desconocido"; // valor por defecto en Java también
+
 	// ==========================
 	// CONSTRUCTORES
 	// ==========================
@@ -32,7 +52,7 @@ public class Moto {
 	public Moto(Long id_moto, String placa, Integer anio, String marca, String modelo, Integer kilometraje,
 			Integer cilindraje, Long id_usuario, String tipoMoto, String ruta_imagenMotos) {
 		super();
-		this.id_moto = id_moto;
+		this.idMoto = id_moto;
 		this.placa = placa;
 		this.anio = anio;
 		this.marca = marca;
@@ -40,18 +60,20 @@ public class Moto {
 		this.kilometraje = kilometraje;
 		this.cilindraje = cilindraje;
 		this.tipoMoto = tipoMoto;
-		this.id_usuario = id_usuario;
-		this.ruta_imagenMotos = ruta_imagenMotos;
-	}
-	
-	// Getters y Setters
-
-	public Long getId_moto() {
-		return id_moto;
+		this.idUsuario = id_usuario;
+		this.rutaImagenMotos = ruta_imagenMotos;
 	}
 
-	public void setId_moto(Long id_moto) {
-		this.id_moto = id_moto;
+	// ==========================
+	// GETTERS & SETTERS
+	// ==========================
+
+	public Long getIdMoto() {
+		return idMoto;
+	}
+
+	public void setIdMoto(Long idMoto) {
+		this.idMoto = idMoto;
 	}
 
 	public String getPlaca() {
@@ -118,12 +140,29 @@ public class Moto {
 		this.cilindraje = cilindraje;
 	}
 
+	public String getRutaImagenMotos() {
+		return rutaImagenMotos;
+	}
+
+	public void setRutaImagenMotos(String rutaImagenMotos) {
+		this.rutaImagenMotos = rutaImagenMotos != null ? rutaImagenMotos : "Desconocido";
+	}
+
+	public String getTipoMoto() {
+		return tipoMoto;
+	}
+
+	public void setTipoMoto(String tipoMoto) {
+		this.tipoMoto = tipoMoto;
+	}
+
 	public Long getId_usuario() {
-		return id_usuario;
+		return idUsuario;
 	}
 
 	public void setId_usuario(Long id_usuario) {
-		this.id_usuario = id_usuario;
+		this.idUsuario = id_usuario;
 	}
 
+	
 }

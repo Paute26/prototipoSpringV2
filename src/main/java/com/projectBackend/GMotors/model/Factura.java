@@ -1,6 +1,7 @@
 package com.projectBackend.GMotors.model;
 
 import jakarta.persistence.*;
+import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -18,15 +19,16 @@ public class Factura {
     @Column(name = "id_usuario", nullable = false)
     private Long idUsuario;
 
-    // ===== Constructores =====
-    public Factura() {}
+    @Column(
+        name = "costo_total",
+        precision = 10,
+        scale = 2,
+        nullable = false
+    )
+    private BigDecimal costoTotal = BigDecimal.ZERO;
 
-    public Factura(LocalDate fechaEmision, Long idUsuario) {
-        this.fechaEmision = fechaEmision;
-        this.idUsuario = idUsuario;
-    }
+    // ================== GETTERS & SETTERS ==================
 
-    // ===== Getters y Setters =====
     public Long getIdFactura() {
         return idFactura;
     }
@@ -49,5 +51,13 @@ public class Factura {
 
     public void setIdUsuario(Long idUsuario) {
         this.idUsuario = idUsuario;
+    }
+
+    public BigDecimal getCostoTotal() {
+        return costoTotal;
+    }
+
+    public void setCostoTotal(BigDecimal costoTotal) {
+        this.costoTotal = costoTotal;
     }
 }

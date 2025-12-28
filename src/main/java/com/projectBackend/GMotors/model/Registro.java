@@ -9,28 +9,48 @@ public class Registro {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id_registro;
+    @Column(name = "id_registro")
+    private Long idRegistro;
 
+    @Column(nullable = false)
     private LocalDate fecha;
 
-    @Column(length = 300)
+    @Column(length = 300, nullable = false)
     private String observaciones;
 
+    @Column(nullable = false)
     private Integer estado;
 
-    private Long id_factura;
-    private Long id_encargado;
-    private Long id_cliente;
-    private Long id_tipo;
+    // ================== RELACIONES ==================
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_factura", nullable = false)
+    private Factura factura;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_encargado", nullable = false)
+    private Usuario encargado;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_cliente", nullable = false)
+    private Usuario cliente;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_tipo", nullable = false)
+    private Tipo tipo;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_moto", nullable = false)
+    private Moto moto;
 
     // ================== GETTERS & SETTERS ==================
 
-    public Long getId_registro() {
-        return id_registro;
+    public Long getIdRegistro() {
+        return idRegistro;
     }
 
-    public void setId_registro(Long id_registro) {
-        this.id_registro = id_registro;
+    public void setIdRegistro(Long idRegistro) {
+        this.idRegistro = idRegistro;
     }
 
     public LocalDate getFecha() {
@@ -57,35 +77,43 @@ public class Registro {
         this.estado = estado;
     }
 
-    public Long getId_factura() {
-        return id_factura;
+    public Factura getFactura() {
+        return factura;
     }
 
-    public void setId_factura(Long id_factura) {
-        this.id_factura = id_factura;
+    public void setFactura(Factura factura) {
+        this.factura = factura;
     }
 
-    public Long getId_encargado() {
-        return id_encargado;
+    public Usuario getEncargado() {
+        return encargado;
     }
 
-    public void setId_encargado(Long id_encargado) {
-        this.id_encargado = id_encargado;
+    public void setEncargado(Usuario encargado) {
+        this.encargado = encargado;
     }
 
-    public Long getId_cliente() {
-        return id_cliente;
+    public Usuario getCliente() {
+        return cliente;
     }
 
-    public void setId_cliente(Long id_cliente) {
-        this.id_cliente = id_cliente;
+    public void setCliente(Usuario cliente) {
+        this.cliente = cliente;
     }
 
-    public Long getId_tipo() {
-        return id_tipo;
+    public Tipo getTipo() {
+        return tipo;
     }
 
-    public void setId_tipo(Long id_tipo) {
-        this.id_tipo = id_tipo;
+    public void setTipo(Tipo tipo) {
+        this.tipo = tipo;
+    }
+
+    public Moto getMoto() {
+        return moto;
+    }
+
+    public void setMoto(Moto moto) {
+        this.moto = moto;
     }
 }
