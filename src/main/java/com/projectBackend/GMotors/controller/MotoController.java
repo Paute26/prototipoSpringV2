@@ -70,15 +70,6 @@ public class MotoController {
         List<Moto> motos = motoService.listarPorUsuario(idUsuario);
         return ResponseEntity.ok(motos);
     }
-    
-    // ======================================================
-    // LISTAR MOTOS POR USUARIO
-    // ======================================================
-    
-    @GetMapping("/usuario/{idUsuario}")
-    public List<Moto> listarMotosPorUsuario(@PathVariable Long idUsuario) {
-        return motoService.listarPorUsuario(idUsuario);
-    }
 
     // ======================================================
     // ACTUALIZAR MOTO
@@ -109,102 +100,6 @@ public class MotoController {
     }
     
     // ======================================================
-    // DETECTAR PLACA CON OCR 
-    // ======================================================
-    @PostMapping("/ocr/placa")
-    public ResponseEntity<Map<String, String>> detectarPlaca(
-            @RequestParam("image") MultipartFile image) {
-        try {
-            System.out.println("[CONTROLLER] Recibiendo imagen para OCR...");
-            System.out.println("[CONTROLLER] Nombre: " + image.getOriginalFilename());
-            System.out.println("[CONTROLLER] Tamaño: " + image.getSize() + " bytes");
-            
-            // Consumir Flask OCR
-            String placaDetectada = flaskOcrClient.detectarPlaca(image);
-
-            if (placaDetectada == null || placaDetectada.isBlank()) {
-                System.out.println("❌ [CONTROLLER] No se detectó placa");
-                return ResponseEntity.ok(Map.of("placa", ""));
-            }
-
-            System.out.println("✅ [CONTROLLER] Placa detectada: " + placaDetectada);
-            return ResponseEntity.ok(Map.of("placa", placaDetectada));
-
-        } catch (Exception e) {
-            System.err.println("❌ [CONTROLLER] Error en OCR:");
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(Map.of("placa", "", "error", e.getMessage()));
-        }
-    }
-    
-    // ======================================================
-    // ACTUALIZAR PLACA CON OCR (FLASK)
-    // ======================================================
-    @PostMapping("/{id}/ocr-placa")
-    public ResponseEntity<Moto> actualizarPlacaConOCR(
-            @PathVariable Long id,
-            @RequestParam("image") MultipartFile image) {
-        try {
-            // Consumir Flask OCR
-            String placaDetectada = flaskOcrClient.detectarPlaca(image);
-
-            if (placaDetectada == null || placaDetectada.isBlank()) {
-                return ResponseEntity.badRequest().build();
-            }
-
-            // Reutilizar el service existente
-            Moto patch = new Moto();
-            patch.setPlaca(placaDetectada);
-
-            Moto motoActualizada = motoService.actualizarMoto(id, patch);
-            return ResponseEntity.ok(motoActualizada);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
-        }
-    }
-    
-    // ======================================================
-    // SUBIR FOTO MOTO
-    // ======================================================
-    @PostMapping("/upload")
-    public ResponseEntity<String> subirImagen(
-            @RequestParam("file") MultipartFile file,
-            HttpServletRequest request) {
-        try {
-            // Carpeta física
-            String carpeta = "C:/Users/USUARIO/Desktop/prototipoSpring/gmotors/uploads/motos/";
-            Path carpetaPath = Paths.get(carpeta);
-
-            if (!Files.exists(carpetaPath)) {
-                Files.createDirectories(carpetaPath);
-            }
-
-            // Nombre del archivo
-            String nombreArchivo = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            Path rutaArchivo = carpetaPath.resolve(nombreArchivo);
-
-            // Guardar archivo
-            Files.copy(file.getInputStream(), rutaArchivo, StandardCopyOption.REPLACE_EXISTING);
-
-            // Detecta automáticamente host + puerto
-            String baseUrl = request.getScheme() + "://" +
-                           request.getServerName() + ":" +
-                           request.getServerPort();
-
-            String urlImagen = baseUrl + "/images/motos/" + nombreArchivo;
-            return ResponseEntity.ok(urlImagen);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al subir la imagen");
-        }
-    }
-    
- // ======================================================
     // DETECTAR PLACA CON OCR 
     // ======================================================
     
