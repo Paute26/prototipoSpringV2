@@ -1,6 +1,7 @@
 package com.projectBackend.GMotors.model;
 
 import jakarta.persistence.*;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 @Entity
 @Table(name = "motos", uniqueConstraints = @UniqueConstraint(columnNames = "placa"))
@@ -35,13 +36,15 @@ public class Moto {
 	@Column(name = "id_usuario", nullable = false)
 	private Long idUsuario;
 
-
-	// ==========================
-	// ✅ NUEVA COLUMNA (faltaban)
-	// ==========================
-
 	@Column(name = "ruta_imagen_motos", nullable = false, length = 255)
-	private String rutaImagenMotos = "Desconocido"; // valor por defecto en Java también
+	private String rutaImagenMotos = "Desconocido"; 
+	
+	
+	// Inner Join: Por Cada placa, extraer la información del dueño ignorando algunos campos
+	@ManyToOne(fetch = FetchType.EAGER)
+	@JoinColumn(name = "id_usuario", insertable = false, updatable = false)
+	@JsonIgnoreProperties({"contrasena", "correo", "descripcion", "ruta_imagen"})
+	private Usuario usuario;
 
 	// ==========================
 	// CONSTRUCTORES
@@ -154,6 +157,14 @@ public class Moto {
 
 	public void setId_usuario(Long id_usuario) {
 		this.idUsuario = id_usuario;
+	}
+	
+	public Usuario getUsuario() {
+		return usuario;
+	}
+
+	public void setUsuario(Usuario usuario) {
+		this.usuario = usuario;
 	}
 
 	

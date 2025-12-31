@@ -132,6 +132,81 @@ public class MotoController {
     }
     
     
+ // ======================================================
+ // BUSCAR USUARIO POR PLACA (CON OCR)
+ // ======================================================
+ @PostMapping("/ocr/buscar-dueno")
+ public ResponseEntity<?> buscarDuenoPorPlaca(
+         @RequestParam("image") MultipartFile image
+ ) {
+     try {
+         System.out.println("Recibiendo imagen para buscar dueño...");
+         //System.out.println("Tamaño: " + image.getSize() + " bytes");
+         
+         // Detectar placa con OCR
+         String placaDetectada = flaskOcrClient.detectarPlaca(image);
+
+         if (placaDetectada == null || placaDetectada.isBlank()) {
+             System.out.println("❌ [CONTROLLER] No se detectó placa");
+             return ResponseEntity.ok(Map.of(
+                 "success", false,
+                 "mensaje", "No se pudo detectar la placa en la imagen"
+             ));
+         }
+
+         System.out.println("Placa detectada: " + placaDetectada);
+
+         // 2Buscar moto por placa en BD
+         Optional<Moto> motoOpt = motoService.buscarPorPlaca(placaDetectada);
+
+         if (motoOpt.isEmpty()) {
+             System.out.println("No se encontró vehículo con placa: " + placaDetectada);
+             return ResponseEntity.ok(Map.of(
+                 "success", false,
+                 "placa", placaDetectada,
+                 "mensaje", "No se encontró vehículo registrado con esta placa"
+             ));
+         }
+
+         Moto moto = motoOpt.get();
+         System.out.println("Vehículo encontrado ID: " + moto.getIdMoto());
+
+         // Verificar que tenga usuario asociado
+         if (moto.getUsuario() == null) {
+             System.out.println("El vehículo no tiene usuario asociado");
+             return ResponseEntity.ok(Map.of(
+                 "success", false,
+                 "placa", placaDetectada,
+                 "mensaje", "El vehículo no tiene un dueño registrado"
+             ));
+         }
+
+         // Preparar respuesta con datos del usuario y moto
+         Map<String, Object> respuesta = Map.of(
+             "success", true,
+             "placa", placaDetectada,
+             "idUsuario", moto.getId_usuario(),
+             "nombreCompleto", moto.getUsuario().getNombre_completo(),
+             "idMoto", moto.getIdMoto(),
+             "modelo", moto.getModelo(),
+             "marca", moto.getMarca()
+         );
+
+         System.out.println("Usuario encontrado: " + moto.getUsuario().getNombre_completo());
+         return ResponseEntity.ok(respuesta);
+
+     } catch (Exception e) {
+         System.err.println("Error en buscar usuario:");
+         e.printStackTrace();
+         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                 .body(Map.of(
+                     "success", false,
+                     "mensaje", "Error al procesar la solicitud: " + e.getMessage()
+                 ));
+     }
+ }
+ 
+ 
     // ======================================================
     // ACTUALIZAR PLACA CON OCR (FLASK)
     // ======================================================

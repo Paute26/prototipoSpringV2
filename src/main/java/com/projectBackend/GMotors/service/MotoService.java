@@ -43,6 +43,11 @@ public class MotoService {
     public List<Moto> listarPorUsuario(Long idUsuario) {
         return motoRepository.findByIdUsuario(idUsuario);
     }
+    
+ // Buscar usuario por Placa
+    public Optional<Moto> buscarPorPlaca(String placa) {
+        return motoRepository.findByPlacaIgnoreCase(placa);
+    }
 
 
 	// Actualizar moto
