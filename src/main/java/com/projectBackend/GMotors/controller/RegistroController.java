@@ -86,11 +86,24 @@ public class RegistroController {
                  registroService.listarPorEncargado(idEncargado)
          );
      }
-     
+    
+  // ================= HISTORIAL DE MANTENIMIENTOS POR USUARIO =================
+     @GetMapping("/historial/{idCliente}")
+     public ResponseEntity<?> obtenerHistorialMantenimientos(
+             @PathVariable Long idCliente
+     ) {
+         try {
+             List<RegistroListadoDTO> historial = registroService.obtenerHistorialPorCliente(idCliente);
+             return ResponseEntity.ok(historial);
+         } catch (Exception e) {
+             return ResponseEntity
+                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                     .body("Error al obtener historial: " + e.getMessage());
+         }
+     }
+
      @GetMapping("/{id}")
      public RegistroListadoDTO obtenerDetalle(@PathVariable Long id) {
          return registroService.obtenerDetalle(id);
      }
-     
-
 }

@@ -12,4 +12,6 @@ public interface RegistroRepository extends JpaRepository<Registro, Long> {
     List<Registro> findByEncargado_IdUsuario(Long idEncargado);
 
     List<Registro> findByEstado(Integer estado);
+    
+    List<Registro> findByCliente_IdUsuarioOrderByFechaDesc(Long idCliente);
 }

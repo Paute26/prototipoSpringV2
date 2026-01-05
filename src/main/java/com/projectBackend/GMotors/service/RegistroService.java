@@ -13,6 +13,7 @@ import com.projectBackend.GMotors.repository.TipoRepository;
 import com.projectBackend.GMotors.repository.UsuarioRepository;
 
 import java.util.List;
+import java.util.Comparator;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -115,6 +116,20 @@ public class RegistroService {
                 .toList();
     }
 
+    // ================= HISTORIAL DE MANTENIMIENTOS POR CLIENTE =================
+    @Transactional(readOnly = true)
+    public List<RegistroListadoDTO> obtenerHistorialPorCliente(Long idCliente) {
+        // Validar que el cliente existe
+        usuarioRepository.findById(idCliente)
+                .orElseThrow(() ->
+                        new RuntimeException("[BE:REG-SVC]: Cliente no encontrado"));
+
+        return registroRepository.findByCliente_IdUsuarioOrderByFechaDesc(idCliente)
+                .stream()
+                .map(this::mapToDTO)
+                .toList();
+    }
+    
     // ================= LISTAR POR ENCARGADO =================
     @Transactional(readOnly = true)
     public List<RegistroListadoDTO> listarPorEncargado(Long idEncargado) {
