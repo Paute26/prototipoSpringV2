@@ -4,19 +4,25 @@ import com.projectBackend.GMotors.dto.RegistroCreateDTO;
 import com.projectBackend.GMotors.dto.RegistroListadoDTO;
 import com.projectBackend.GMotors.model.Registro;
 import com.projectBackend.GMotors.service.RegistroService;
+import com.projectBackend.GMotors.config.FlaskOcrClient;
 
 import java.util.List;
 import java.util.Map;
+import org.springframework.web.multipart.MultipartFile;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.beans.factory.annotation.Autowired;
 
 @RestController
 @RequestMapping("/api/registros")
 public class RegistroController {
 
     private final RegistroService registroService;
+    
+    @Autowired
+    private FlaskOcrClient flaskOcrClient;
 
     public RegistroController(RegistroService registroService) {
         this.registroService = registroService;
@@ -99,6 +105,77 @@ public class RegistroController {
              return ResponseEntity
                      .status(HttpStatus.INTERNAL_SERVER_ERROR)
                      .body("Error al obtener historial: " + e.getMessage());
+         }
+     }
+     
+     
+  // ================= BUSCAR HISTORIAL POR PLACA (CON OCR) =================
+     @PostMapping("/ocr/historial")
+     public ResponseEntity<?> obtenerHistorialPorPlacaOCR(
+             @RequestParam("image") MultipartFile image
+     ) {
+         try {
+             System.out.println("[REGISTRO-CONTROLLER] Recibiendo imagen para OCR...");
+             
+             // Detectar placa con OCR (usando FlaskOcrClient)
+             String placaDetectada = flaskOcrClient.detectarPlaca(image);
+
+             if (placaDetectada == null || placaDetectada.isBlank()) {
+                 System.out.println("❌ No se detectó placa");
+                 return ResponseEntity.ok(Map.of(
+                     "success", false,
+                     "mensaje", "No se pudo detectar la placa en la imagen"
+                 ));
+             }
+
+             //System.out.println("Placa detectada: " + placaDetectada);
+
+             // 2Buscar historial por placa
+             List<RegistroListadoDTO> historial = registroService.buscarPorPlacaMoto(placaDetectada);
+
+             if (historial.isEmpty()) {
+                 System.out.println("No hay registros para la placa: " + placaDetectada);
+                 return ResponseEntity.ok(Map.of(
+                     "success", false,
+                     "placa", placaDetectada,
+                     "mensaje", "No hay historial de mantenimientos para esta placa"
+                 ));
+             }
+
+             //System.out.println("Encontrados " + historial.size() + " registros");
+             return ResponseEntity.ok(Map.of(
+                 "success", true,
+                 "placa", placaDetectada,
+                 "historial", historial
+             ));
+
+         } catch (Exception e) {
+             System.err.println("❌ Error en OCR historial:");
+             e.printStackTrace();
+             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                     .body(Map.of(
+                         "success", false,
+                         "mensaje", "Error al procesar la solicitud: " + e.getMessage()
+                     ));
+         }
+     }
+     
+     //  ================= BUSCAR POR NOMBRE DE CLIENTE =================
+     @GetMapping("/buscar/nombre")
+     public ResponseEntity<?> buscarPorNombre(
+             @RequestParam String nombreCliente
+     ) {
+         try {
+             List<RegistroListadoDTO> resultados = registroService.buscarPorNombreCliente(nombreCliente);
+             return ResponseEntity.ok(resultados);
+         } catch (IllegalArgumentException e) {
+             return ResponseEntity
+                     .status(HttpStatus.BAD_REQUEST)
+                     .body(e.getMessage());
+         } catch (Exception e) {
+             return ResponseEntity
+                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                     .body("Error al buscar registros: " + e.getMessage());
          }
      }
 

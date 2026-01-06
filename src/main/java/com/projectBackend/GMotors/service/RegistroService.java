@@ -130,6 +130,32 @@ public class RegistroService {
                 .toList();
     }
     
+ // ================= BUSCAR POR NOMBRE DE CLIENTE =================
+    @Transactional(readOnly = true)
+    public List<RegistroListadoDTO> buscarPorNombreCliente(String nombreCliente) {
+        if (nombreCliente == null || nombreCliente.isBlank()) {
+            throw new IllegalArgumentException("[BE:REG-SVC]: El nombre del cliente no puede estar vacío");
+        }
+
+        return registroRepository.buscarPorNombreCliente(nombreCliente)
+                .stream()
+                .map(this::mapToDTO)
+                .toList();
+    }
+    
+ // ================= BUSCAR POR PLACA DE MOTO =================
+    @Transactional(readOnly = true)
+    public List<RegistroListadoDTO> buscarPorPlacaMoto(String placa) {
+        if (placa == null || placa.isBlank()) {
+            throw new IllegalArgumentException("[BE:REG-SVC]: La placa no puede estar vacía");
+        }
+
+        return registroRepository.findByMoto_Placa(placa)
+                .stream()
+                .map(this::mapToDTO)
+                .toList();
+    }
+    
     // ================= LISTAR POR ENCARGADO =================
     @Transactional(readOnly = true)
     public List<RegistroListadoDTO> listarPorEncargado(Long idEncargado) {
@@ -165,6 +191,10 @@ public class RegistroService {
                 registro.getMoto().getRutaImagenMotos()
         );
 
+        dto.setPlacaMoto(
+                registro.getMoto().getPlaca()
+        );
+        
         dto.setTipoMantenimiento(
                 registro.getTipo().getNombre()
         );

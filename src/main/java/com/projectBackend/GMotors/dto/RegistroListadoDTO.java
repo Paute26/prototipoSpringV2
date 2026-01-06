@@ -13,6 +13,7 @@ public class RegistroListadoDTO {
     // ================== MOTO ==================
     private String marcaMoto;
     private String modeloMoto;
+    private String placaMoto;
     private String rutaImagenMoto;
 
     // ================== MANTENIMIENTO ==================
@@ -57,6 +58,14 @@ public class RegistroListadoDTO {
         this.modeloMoto = modeloMoto;
     }
 
+    public String getPlacaMoto() {
+        return placaMoto;
+    }
+    
+    public void setPlacaMoto(String placaMoto) {
+        this.placaMoto = placaMoto;
+    }
+    
     public String getRutaImagenMoto() {
         return rutaImagenMoto;
     }
