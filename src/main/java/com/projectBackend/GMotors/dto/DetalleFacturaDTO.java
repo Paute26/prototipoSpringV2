@@ -12,6 +12,7 @@ public class DetalleFacturaDTO {
     private BigDecimal subtotal;
     private Long idProducto;
 
+
     public DetalleFacturaDTO() {}
 
     public DetalleFacturaDTO(Long idDetalleFactura, String descripcion, 

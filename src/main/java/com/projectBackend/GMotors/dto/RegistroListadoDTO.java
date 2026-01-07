@@ -1,6 +1,7 @@
 package com.projectBackend.GMotors.dto;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public class RegistroListadoDTO {
 
@@ -20,7 +21,13 @@ public class RegistroListadoDTO {
     private LocalDate fecha;
     private String descripcion;
     private String tipoMantenimiento;
+    
+ // ================== COSTO ==================
+    private Double costoTotal;
 
+ // ================== DETALLES FACTURA ===============
+    private List<DetalleFacturaDTO> detalles;
+    
     // ================== ESTADO ==================
     private Integer estado;
 
@@ -98,6 +105,22 @@ public class RegistroListadoDTO {
         this.tipoMantenimiento = tipoMantenimiento;
     }
 
+    public List<DetalleFacturaDTO> getDetalles() {
+        return detalles;
+    }
+
+    public void setDetalles(List<DetalleFacturaDTO> detalles) {
+        this.detalles = detalles;
+    }
+    
+    public Double getCostoTotal() {
+        return costoTotal;
+    }
+
+    public void setCostoTotal(Double costoTotal) {
+        this.costoTotal = costoTotal;
+    }
+    
     public Integer getEstado() {
         return estado;
     }

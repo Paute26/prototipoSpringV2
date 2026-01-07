@@ -3,6 +3,7 @@ package com.projectBackend.GMotors.model;
 import jakarta.persistence.*;
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "facturas")
@@ -27,6 +28,8 @@ public class Factura {
     )
     private BigDecimal costoTotal = BigDecimal.ZERO;
 
+    
+    
     // ================== GETTERS & SETTERS ==================
 
     public Long getIdFactura() {
@@ -60,4 +63,5 @@ public class Factura {
     public void setCostoTotal(BigDecimal costoTotal) {
         this.costoTotal = costoTotal;
     }
+    
 }

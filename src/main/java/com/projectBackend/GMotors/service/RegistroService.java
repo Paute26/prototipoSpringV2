@@ -2,6 +2,7 @@ package com.projectBackend.GMotors.service;
 
 import com.projectBackend.GMotors.dto.RegistroCreateDTO;
 import com.projectBackend.GMotors.dto.RegistroListadoDTO;
+import com.projectBackend.GMotors.dto.DetalleFacturaDTO; 
 import com.projectBackend.GMotors.model.Factura;
 import com.projectBackend.GMotors.model.Moto;
 import com.projectBackend.GMotors.model.Registro;
@@ -198,6 +199,13 @@ public class RegistroService {
         dto.setTipoMantenimiento(
                 registro.getTipo().getNombre()
         );
+        
+        if (registro.getFactura() != null && registro.getFactura().getCostoTotal() != null) {
+            dto.setCostoTotal(
+                    registro.getFactura().getCostoTotal().doubleValue()
+            );
+            
+        }
 
         return dto;
     }
