@@ -17,6 +17,9 @@ public class MotoService {
     private MotoRepository motoRepository;
     
     @Autowired
+    private SupabaseStorageService supabaseStorageService;
+    
+    @Autowired
     private UsuarioRepository usuarioRepository;
 
     // ✅ Crear moto (CON validación de usuario)
@@ -78,7 +81,18 @@ public class MotoService {
 	        motoDB.setTipoMoto(motoActualizada.getTipoMoto()); 
 	    }
 	    if (motoActualizada.getRuta_imagenMotos() != null) {
-	        motoDB.setRuta_imagenMotos(motoActualizada.getRuta_imagenMotos());  
+	        // Si la imagen cambió, eliminar la anterior
+	        if (motoDB.getRuta_imagenMotos() != null &&
+	            !motoDB.getRuta_imagenMotos().equals(motoActualizada.getRuta_imagenMotos())) {
+	            
+	            try {
+	                supabaseStorageService.eliminarImagen(motoDB.getRuta_imagenMotos());
+	            } catch (Exception e) {
+	                System.err.println("Advertencia: No se pudo eliminar imagen anterior: " + e.getMessage());
+	                // No interrumpir el flujo si falla la eliminación
+	            }
+	        }
+	        motoDB.setRuta_imagenMotos(motoActualizada.getRuta_imagenMotos());
 	    }
 	    if (motoActualizada.getId_usuario() != null) {
 	        motoDB.setId_usuario(motoActualizada.getId_usuario());

@@ -13,6 +13,9 @@ public class ProductoService {
 
     @Autowired
     private ProductoRepository productoRepository;
+    
+    @Autowired
+    private SupabaseStorageService supabaseStorageService;
 
     // Obtener todos los productos
     public List<Producto> getAllProductos() {
@@ -45,9 +48,22 @@ public class ProductoService {
             existing.setStock(producto.getStock());
             existing.setCodigo_personal(producto.getCodigo_personal());
             existing.setCodigo_proveedor(producto.getCodigo_proveedor());
-            existing.setruta_imagenproductos(producto.getruta_imagenproductos());
-            existing.setPvp(producto.getPvp());
+            if (producto.getruta_imagenproductos() != null) {
+                // Si la imagen cambió, eliminar la anterior
+                if (existing.getruta_imagenproductos() != null &&
+                    !existing.getruta_imagenproductos().equals(producto.getruta_imagenproductos())) {
+                    
+                    try {
+                        supabaseStorageService.eliminarImagen(existing.getruta_imagenproductos());
+                    } catch (Exception e) {
+                        //System.err.println("Advertencia: No se pudo eliminar imagen anterior: " + e.getMessage());
+                        // No interrumpir el flujo si falla la eliminación
+                    }
+                }
+                existing.setruta_imagenproductos(producto.getruta_imagenproductos());
+            }
             
+            existing.setPvp(producto.getPvp());
 
             // IMPORTANTE:
             existing.setFecha_modificacion(LocalDate.now());

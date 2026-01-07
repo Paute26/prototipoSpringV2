@@ -20,6 +20,9 @@ public class UsuarioService {
 	
 	@Autowired
     private PasswordEncoder passwordEncoder;
+	
+	@Autowired
+	private SupabaseStorageService supabaseStorageService;
 
 	// METODOS
 
@@ -61,10 +64,21 @@ public class UsuarioService {
         if (usuarioActualizado.getDescripcion() != null) {
             usuarioExistente.setDescripcion(usuarioActualizado.getDescripcion());
         }
-        if (usuarioActualizado.getRutaimagen() != null) {
-            usuarioExistente.setRutaimagen(usuarioActualizado.getRutaimagen());
-        }
-        
+    	// ✅ Manejar cambios de imagen
+		if (usuarioActualizado.getRutaimagen() != null) {
+			// Si la imagen cambió, eliminar la anterior
+			if (usuarioExistente.getRutaimagen() != null &&
+				!usuarioExistente.getRutaimagen().equals(usuarioActualizado.getRutaimagen())) {
+				
+				try {
+					supabaseStorageService.eliminarImagen(usuarioExistente.getRutaimagen());
+				} catch (Exception e) {
+					System.err.println("Advertencia: No se pudo eliminar imagen anterior: " + e.getMessage());
+					// No interrumpir el flujo si falla la eliminación
+				}
+			}
+			usuarioExistente.setRutaimagen(usuarioActualizado.getRutaimagen());
+		}
      // Si envían nueva contraseña → encriptar
         if (usuarioActualizado.getContrasena() != null && !usuarioActualizado.getContrasena().isBlank()) {
             usuarioExistente.setContrasena(

@@ -11,6 +11,8 @@ import com.projectBackend.GMotors.config.JwtUtil;
 import com.projectBackend.GMotors.dto.AuthResponse;
 import com.projectBackend.GMotors.model.Usuario;
 import com.projectBackend.GMotors.service.UsuarioService;
+import com.projectBackend.GMotors.service.SupabaseStorageService;
+
 
 import java.util.List;
 import java.util.Optional;
@@ -23,6 +25,9 @@ public class UsuarioController {
 
     @Autowired
     private UsuarioService usuarioService;
+    
+    @Autowired
+    private SupabaseStorageService supabaseStorageService;
     
     @Autowired
     private JwtUtil jwtUtil;
@@ -110,42 +115,95 @@ public class UsuarioController {
     // --------------------- Subir Imagen ---------------------
     
     @PostMapping("/upload")
-    public ResponseEntity<String> subirImagen(
-            @RequestParam("file") MultipartFile file,
-            HttpServletRequest request
+    public ResponseEntity<?> subirImagen(
+            @RequestParam("file") MultipartFile file
     ) {
         try {
-            // Carpeta física
-            String carpeta = "C:/Users/USUARIO/Desktop/prototipoSpring/gmotors/uploads/usuarios/";
-            Path carpetaPath = Paths.get(carpeta);
+            //System.out.println("[UPLOAD] Archivo recibido: " + file.getOriginalFilename());
+            //System.out.println("[UPLOAD] Content-Type: " + file.getContentType());
+            //System.out.println("[UPLOAD] Tamaño: " + file.getSize());
 
-            if (!Files.exists(carpetaPath)) {
-                Files.createDirectories(carpetaPath);
+            // Validar archivo vacío
+            if (file.isEmpty()) {
+                //System.out.println("[UPLOAD] ERROR: Archivo vacío");
+                return ResponseEntity
+                        .badRequest()
+                        .body(new UploadResponse(null, "El archivo está vacío"));
             }
 
-            // Nombre del archivo
-            String nombreArchivo = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            Path rutaArchivo = carpetaPath.resolve(nombreArchivo);
+            // Validar tipo de archivo (acepta image/* y también octet-stream que es lo que envía Flutter)
+            String filename = file.getOriginalFilename();
+            //System.out.println("[UPLOAD] Validando extensión: " + filename);
 
-            // Guardar archivo
-            Files.copy(file.getInputStream(), rutaArchivo, StandardCopyOption.REPLACE_EXISTING);
+            boolean esImagen = filename != null && (
+                filename.toLowerCase().endsWith(".jpg") ||
+                filename.toLowerCase().endsWith(".jpeg") ||
+                filename.toLowerCase().endsWith(".png") ||
+                filename.toLowerCase().endsWith(".gif") ||
+                filename.toLowerCase().endsWith(".webp")
+            );
 
-            // Detecta automáticamente host + puerto
-            String baseUrl =
-                    request.getScheme() + "://" +
-                    request.getServerName() + ":" +
-                    request.getServerPort();
+            if (!esImagen) {
+                //System.out.println("[UPLOAD] ERROR: Archivo no es imagen válida: " + filename);
+                return ResponseEntity
+                        .badRequest()
+                        .body(new UploadResponse(null, "El archivo debe ser una imagen (jpg, png, gif, webp)"));
+            }
 
-            String urlImagen = baseUrl + "/images/usuarios/" + nombreArchivo;
+            // Validar tamaño (máximo 5MB)
+            if (file.getSize() > 5 * 1024 * 1024) {
+                //System.out.println("[UPLOAD] ERROR: Archivo muy grande: " + file.getSize());
+                return ResponseEntity
+                        .badRequest()
+                        .body(new UploadResponse(null, "El archivo no puede ser mayor a 5MB"));
+            }
 
-            return ResponseEntity.ok(urlImagen);
+            //System.out.println("[UPLOAD] Validaciones pasadas, subiendo a Supabase...");
+
+            // Subir a Supabase
+            String urlImagen = supabaseStorageService.subirImagenUsuario(file);
+
+            //System.out.println("[UPLOAD] URL recibida de Supabase: " + urlImagen);
+
+            return ResponseEntity.ok(new UploadResponse(urlImagen, "Imagen subida exitosamente"));
 
         } catch (Exception e) {
+            //System.out.println("[UPLOAD] EXCEPCIÓN: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al subir la imagen");
+                    .body(new UploadResponse(null, "Error al subir la imagen: " + e.getMessage()));
         }
     }
-   
+
+    // ============== INNER CLASS ==============
+    
+    /**
+     * Clase para la respuesta de upload
+     */
+    public static class UploadResponse {
+        public String url;
+        public String mensaje;
+
+        public UploadResponse(String url, String mensaje) {
+            this.url = url;
+            this.mensaje = mensaje;
+        }
+
+        public String getUrl() {
+            return url;
+        }
+
+        public void setUrl(String url) {
+            this.url = url;
+        }
+
+        public String getMensaje() {
+            return mensaje;
+        }
+
+        public void setMensaje(String mensaje) {
+            this.mensaje = mensaje;
+        }
+    }
 }

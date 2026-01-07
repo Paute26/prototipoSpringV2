@@ -11,6 +11,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import com.projectBackend.GMotors.service.SupabaseStorageService;
 
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -26,6 +27,9 @@ public class MotoController {
 
     @Autowired
     private MotoService motoService;
+    
+    @Autowired
+    private SupabaseStorageService supabaseStorageService;
     
     @Autowired
     private FlaskOcrClient flaskOcrClient;
@@ -242,41 +246,66 @@ public class MotoController {
     // SUBIR FOTO MOTO
     // ======================================================
     @PostMapping("/upload")
-    public ResponseEntity<String> subirImagen(
-            @RequestParam("file") MultipartFile file,
-            HttpServletRequest request
+    public ResponseEntity<?> subirImagen(
+            @RequestParam("file") MultipartFile file
     ) {
         try {
-            // Carpeta física
-            String carpeta = "C:/Users/USUARIO/Desktop/prototipoSpring/gmotors/uploads/motos/";
-            Path carpetaPath = Paths.get(carpeta);
+            //System.out.println("[MOTO-UPLOAD] Archivo recibido: " + file.getOriginalFilename());
+            //System.out.println("[MOTO-UPLOAD] Content-Type: " + file.getContentType());
+            //System.out.println("[MOTO-UPLOAD] Tamaño: " + file.getSize());
 
-            if (!Files.exists(carpetaPath)) {
-                Files.createDirectories(carpetaPath);
+            // Validar archivo vacío
+            if (file.isEmpty()) {
+                //System.out.println("[MOTO-UPLOAD] ERROR: Archivo vacío");
+                return ResponseEntity
+                        .badRequest()
+                        .body(new UsuarioController.UploadResponse(null, "El archivo está vacío"));
             }
 
-            // Nombre del archivo
-            String nombreArchivo = System.currentTimeMillis() + "_" + file.getOriginalFilename();
-            Path rutaArchivo = carpetaPath.resolve(nombreArchivo);
+            // Validar tipo de archivo por extensión
+            String filename = file.getOriginalFilename();
+            //System.out.println("[MOTO-UPLOAD] Validando extensión: " + filename);
 
-            // Guardar archivo
-            Files.copy(file.getInputStream(), rutaArchivo, StandardCopyOption.REPLACE_EXISTING);
+            boolean esImagen = filename != null && (
+                filename.toLowerCase().endsWith(".jpg") ||
+                filename.toLowerCase().endsWith(".jpeg") ||
+                filename.toLowerCase().endsWith(".png") ||
+                filename.toLowerCase().endsWith(".gif") ||
+                filename.toLowerCase().endsWith(".webp")
+            );
 
-            // Detecta automáticamente host + puerto
-            String baseUrl =
-                    request.getScheme() + "://" +
-                    request.getServerName() + ":" +
-                    request.getServerPort();
+            if (!esImagen) {
+                //System.out.println("[MOTO-UPLOAD] ERROR: Archivo no es imagen válida: " + filename);
+                return ResponseEntity
+                        .badRequest()
+                        .body(new UsuarioController.UploadResponse(null, "El archivo debe ser una imagen (jpg, png, gif, webp)"));
+            }
 
-            String urlImagen = baseUrl + "/images/motos/" + nombreArchivo;
+            // Validar tamaño (máximo 5MB)
+            if (file.getSize() > 5 * 1024 * 1024) {
+                //System.out.println("[MOTO-UPLOAD] ERROR: Archivo muy grande: " + file.getSize());
+                return ResponseEntity
+                        .badRequest()
+                        .body(new UsuarioController.UploadResponse(null, "El archivo no puede ser mayor a 5MB"));
+            }
 
-            return ResponseEntity.ok(urlImagen);
+            //System.out.println("[MOTO-UPLOAD] Validaciones pasadas, subiendo a Supabase...");
+
+            // Subir a Supabase (carpeta motos/perfil/)
+            String urlImagen = supabaseStorageService.subirImagenMoto(file);
+
+            //System.out.println("[MOTO-UPLOAD] URL recibida de Supabase: " + urlImagen);
+
+            return ResponseEntity.ok(new UsuarioController.UploadResponse(urlImagen, "Imagen subida exitosamente"));
 
         } catch (Exception e) {
+            System.out.println("[MOTO-UPLOAD] EXCEPCIÓN: " + e.getMessage());
             e.printStackTrace();
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Error al subir la imagen");
+                    .body(new UsuarioController.UploadResponse(null, "Error al subir la imagen: " + e.getMessage()));
         }
     }
 }
+
+    
