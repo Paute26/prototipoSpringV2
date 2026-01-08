@@ -54,6 +54,17 @@ public class DetalleFacturaService {
             detalle.setId_producto(producto.getId_producto());
             // ✅ Descripción tomada del producto
             detalle.setDescripcion(producto.getDescripcion());
+            
+            // Restar el Stock del Producto
+            int nuevoStock = producto.getStock() - dto.getCantidad();
+            if (nuevoStock < 0) {
+                throw new IllegalArgumentException(
+                    "Stock insuficiente para el producto: " + producto.getDescripcion() + 
+                    ". Stock disponible: " + producto.getStock()
+                );
+            }
+            producto.setStock(nuevoStock);
+            productoRepository.save(producto);
 
         }
         // 2️⃣ CASO SERVICIO
