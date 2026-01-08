@@ -2,8 +2,10 @@ package com.projectBackend.GMotors.controller;
 
 import com.projectBackend.GMotors.dto.RegistroCreateDTO;
 import com.projectBackend.GMotors.dto.RegistroListadoDTO;
+import com.projectBackend.GMotors.dto.DetalleFacturaDTO;
 import com.projectBackend.GMotors.model.Registro;
 import com.projectBackend.GMotors.service.RegistroService;
+import com.projectBackend.GMotors.service.FacturaService;
 import com.projectBackend.GMotors.config.FlaskOcrClient;
 
 import java.util.List;
@@ -23,6 +25,9 @@ public class RegistroController {
     
     @Autowired
     private FlaskOcrClient flaskOcrClient;
+    
+    @Autowired
+    private FacturaService facturaService;
 
     public RegistroController(RegistroService registroService) {
         this.registroService = registroService;
@@ -108,6 +113,19 @@ public class RegistroController {
          }
      }
      
+     @GetMapping("/{idFactura}/detalles-factura")
+     public ResponseEntity<List<DetalleFacturaDTO>> obtenerDetallesFactura(
+             @PathVariable Long idFactura
+     ) {
+         try {
+             List<DetalleFacturaDTO> detalles = facturaService.obtenerDetallesPorFactura(idFactura);
+             return ResponseEntity.ok(detalles);
+         } catch (Exception e) {
+             return ResponseEntity
+                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                     .body(null);
+         }
+     }
      
   // ================= BUSCAR HISTORIAL POR PLACA (CON OCR) =================
      @PostMapping("/ocr/historial")

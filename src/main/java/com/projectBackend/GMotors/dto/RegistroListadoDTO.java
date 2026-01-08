@@ -24,6 +24,7 @@ public class RegistroListadoDTO {
     
  // ================== COSTO ==================
     private Double costoTotal;
+    private Long idFactura;
 
  // ================== DETALLES FACTURA ===============
     private List<DetalleFacturaDTO> detalles;
@@ -127,5 +128,13 @@ public class RegistroListadoDTO {
 
     public void setEstado(Integer estado) {
         this.estado = estado;
+    }
+    
+    public Long getIdFactura() {
+        return idFactura;
+    }
+
+    public void setIdFactura(Long idFactura) {
+        this.idFactura = idFactura;
     }
 }

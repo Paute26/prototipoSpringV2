@@ -166,7 +166,7 @@ public class RegistroService {
                 .toList();
     }
 
-    // ================= MAPEO A DTO =================
+ // ================= MAPEO A DTO =================
     private RegistroListadoDTO mapToDTO(Registro registro) {
 
         RegistroListadoDTO dto = new RegistroListadoDTO();
@@ -200,11 +200,15 @@ public class RegistroService {
                 registro.getTipo().getNombre()
         );
         
-        if (registro.getFactura() != null && registro.getFactura().getCostoTotal() != null) {
-            dto.setCostoTotal(
-                    registro.getFactura().getCostoTotal().doubleValue()
-            );
+        if (registro.getFactura() != null) {
+            // MAPEAR ID DE FACTURA
+            dto.setIdFactura(registro.getFactura().getIdFactura());
             
+            if (registro.getFactura().getCostoTotal() != null) {
+                dto.setCostoTotal(
+                        registro.getFactura().getCostoTotal().doubleValue()
+                );
+            }
         }
 
         return dto;

@@ -2,6 +2,8 @@ package com.projectBackend.GMotors.dto;
 
 import java.math.BigDecimal;
 import com.projectBackend.GMotors.model.DetalleFactura;
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class DetalleFacturaDTO {
     
@@ -44,6 +46,13 @@ public class DetalleFacturaDTO {
         );
     }
 
+    // Mapeo de lista desde entidades DetalleFactura
+    public static List<DetalleFacturaDTO> mapToDTOList(List<DetalleFactura> detalles) {
+        return detalles.stream()
+            .map(DetalleFacturaDTO::mapToDTO)
+            .collect(Collectors.toList());
+    }
+    
     // ================= GETTERS & SETTERS =================
 
     public Long getIdDetalleFactura() {

@@ -1,6 +1,7 @@
 package com.projectBackend.GMotors.service;
 
 import com.projectBackend.GMotors.dto.DetalleFacturaCreateDTO;
+import com.projectBackend.GMotors.dto.DetalleFacturaDTO;
 import com.projectBackend.GMotors.model.DetalleFactura;
 import com.projectBackend.GMotors.model.Factura;
 import com.projectBackend.GMotors.repository.DetalleFacturaRepository;
@@ -67,5 +68,10 @@ public class FacturaService {
         // 3️⃣ Actualizar total factura
         factura.setCostoTotal(totalFactura);
         return facturaRepository.save(factura);
+    }
+    
+    public List<DetalleFacturaDTO> obtenerDetallesPorFactura(Long idFactura) {
+        List<DetalleFactura> detalles = detalleFacturaRepository.findByIdFactura(idFactura);
+        return DetalleFacturaDTO.mapToDTOList(detalles);
     }
 }
