@@ -70,6 +70,9 @@ public class MotoService {
 	    }
 	    if (motoActualizada.getModelo() != null) {
 	        motoDB.setModelo(motoActualizada.getModelo());
+	    }   
+	    if (motoActualizada.getNombreMoto() != null) {
+		        motoDB.setNombreMoto(motoActualizada.getNombreMoto());
 	    }
 	    if (motoActualizada.getKilometraje() != null) {
 	        motoDB.setKilometraje(motoActualizada.getKilometraje());

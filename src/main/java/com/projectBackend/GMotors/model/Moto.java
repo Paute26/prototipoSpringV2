@@ -24,6 +24,9 @@ public class Moto {
 	@Column(nullable = false, length = 100)
 	private String modelo;
 
+	@Column(name = "nombremoto", nullable = true, length = 100)
+	private String nombreMoto;
+	
 	@Column(name = "tipo_moto", nullable = false, length = 255)
 	private String tipoMoto;
 	
@@ -52,7 +55,7 @@ public class Moto {
 	public Moto() {
 	}
 
-	public Moto(Long id_moto, String placa, Integer anio, String marca, String modelo, Integer kilometraje,
+	public Moto(Long id_moto, String placa, Integer anio, String marca, String modelo, String nombreMoto, Integer kilometraje,
 			Integer cilindraje, Long id_usuario, String tipoMoto, String ruta_imagenMotos) {
 		super();
 		this.idMoto = id_moto;
@@ -60,6 +63,7 @@ public class Moto {
 		this.anio = anio;
 		this.marca = marca;
 		this.modelo = modelo;
+		this.nombreMoto = nombreMoto;
 		this.kilometraje = kilometraje;
 		this.cilindraje = cilindraje;
 		this.tipoMoto = tipoMoto;
@@ -127,6 +131,14 @@ public class Moto {
 		this.modelo = modelo;
 	}
 
+	public String getNombreMoto() {
+	    return nombreMoto;
+	}
+
+	public void setNombreMoto(String nombreMoto) {
+	    this.nombreMoto = nombreMoto;
+	}
+	
 	public Integer getKilometraje() {
 		return kilometraje;
 	}
