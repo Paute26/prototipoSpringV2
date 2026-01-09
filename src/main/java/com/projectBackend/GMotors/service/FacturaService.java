@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class FacturaService {
@@ -70,8 +71,84 @@ public class FacturaService {
         return facturaRepository.save(factura);
     }
     
+    // =====================================================
+    // ACTUALIZAR FACTURA
+    // =====================================================
+    @Transactional
+    public Factura actualizarFactura(
+            Long idFactura,
+            List<DetalleFacturaCreateDTO> detallesDTO
+    ) {
+        // 1️⃣ Validar que la factura existe
+        Factura factura = facturaRepository.findById(idFactura)
+                .orElseThrow(() -> new IllegalArgumentException(
+                        "Factura no encontrada con ID: " + idFactura
+                ));
+
+        if (detallesDTO == null || detallesDTO.isEmpty()) {
+            throw new IllegalArgumentException(
+                    "La factura debe contener al menos un detalle"
+            );
+        }
+
+        // 2️⃣ Eliminar detalles antiguos
+        detalleFacturaRepository.deleteByIdFactura(idFactura);
+
+        BigDecimal totalFactura = BigDecimal.ZERO;
+
+        // 3️⃣ Crear nuevos detalles
+        for (DetalleFacturaCreateDTO dto : detallesDTO) {
+            DetalleFactura detalle =
+                    detalleFacturaService.crearDetalle(dto, factura);
+            detalleFacturaRepository.save(detalle);
+            totalFactura = totalFactura.add(detalle.getSubtotal());
+        }
+
+        // 4️⃣ Actualizar total factura
+        factura.setCostoTotal(totalFactura);
+        factura = facturaRepository.save(factura);  // ✅ ASEGÚRATE DE GUARDAR
+        
+        System.out.println("✅ Factura actualizada: " + factura.getIdFactura() + " → Total: " + totalFactura);
+        
+        return factura;
+    }
+    
+    
     public List<DetalleFacturaDTO> obtenerDetallesPorFactura(Long idFactura) {
         List<DetalleFactura> detalles = detalleFacturaRepository.findByIdFactura(idFactura);
         return DetalleFacturaDTO.mapToDTOList(detalles);
+    }
+    
+    // =====================================================
+    // OBTENER FACTURA POR ID
+    // =====================================================
+    public Optional<Factura> obtenerFacturaPorId(Long idFactura) {
+        return facturaRepository.findById(idFactura);
+    }
+
+    // =====================================================
+    // OBTENER FACTURAS POR USUARIO
+    // =====================================================
+    public List<Factura> obtenerFacturasPorUsuario(Long idUsuario) {
+        return facturaRepository.findByIdUsuario(idUsuario);
+    }
+
+    // =====================================================
+    // ELIMINAR FACTURA
+    // =====================================================
+    @Transactional
+    public void eliminarFactura(Long idFactura) {
+        // Verificar que existe
+        if (!facturaRepository.existsById(idFactura)) {
+            throw new IllegalArgumentException(
+                    "Factura no encontrada con ID: " + idFactura
+            );
+        }
+
+        // Eliminar detalles primero
+        detalleFacturaRepository.deleteByIdFactura(idFactura);
+
+        // Eliminar factura
+        facturaRepository.deleteById(idFactura);
     }
 }

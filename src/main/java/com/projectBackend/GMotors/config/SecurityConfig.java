@@ -51,7 +51,9 @@ public class SecurityConfig {
                 // ============================
                 .requestMatchers("/api/usuarios/**").authenticated()
                 .requestMatchers("/api/motos/**").authenticated()
-
+                .requestMatchers(HttpMethod.PUT, "/api/registros/**").authenticated()  
+                .requestMatchers(HttpMethod.GET, "/api/registros/**").authenticated()  
+                .requestMatchers(HttpMethod.POST, "/api/registros/**").authenticated()
                 // Cualquier otra ruta, requiere token
                 .anyRequest().authenticated()
             )

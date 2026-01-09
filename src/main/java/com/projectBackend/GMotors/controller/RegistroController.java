@@ -3,13 +3,16 @@ package com.projectBackend.GMotors.controller;
 import com.projectBackend.GMotors.dto.RegistroCreateDTO;
 import com.projectBackend.GMotors.dto.RegistroListadoDTO;
 import com.projectBackend.GMotors.dto.DetalleFacturaDTO;
+import com.projectBackend.GMotors.dto.DetalleFacturaCreateDTO;
 import com.projectBackend.GMotors.model.Registro;
+import com.projectBackend.GMotors.model.Factura;
 import com.projectBackend.GMotors.service.RegistroService;
 import com.projectBackend.GMotors.service.FacturaService;
 import com.projectBackend.GMotors.config.FlaskOcrClient;
 
 import java.util.List;
 import java.util.Map;
+import java.util.HashMap;
 import org.springframework.web.multipart.MultipartFile;
 
 import org.springframework.http.HttpStatus;
@@ -70,6 +73,101 @@ public class RegistroController {
         return ResponseEntity.ok(body);
     }
 
+    
+ // =====================================================
+ // ACTUALIZAR FACTURA
+ // =====================================================
+ @PutMapping("/{idRegistro}/factura")  
+ public ResponseEntity<Map<String, Object>> actualizarFactura(
+         @PathVariable Long idRegistro,  
+         @RequestBody List<DetalleFacturaCreateDTO> detallesDTO
+ ) {
+     System.out.println("[RegistroController] PUT /api/registros/" + idRegistro + "/factura");
+     System.out.println(" Detalles recibidos: " + detallesDTO);
+     
+     try {
+         Factura factura = facturaService.actualizarFactura(idRegistro, detallesDTO);
+
+         Map<String, Object> response = new HashMap<>();
+         response.put("success", true);
+         response.put("mensaje", "Factura actualizada exitosamente");
+         response.put("idFactura", factura.getIdFactura());
+         response.put("costoTotal", factura.getCostoTotal());
+         response.put("fechaEmision", factura.getFechaEmision());
+
+         return ResponseEntity.ok(response);
+
+     } catch (IllegalArgumentException e) {
+         Map<String, Object> error = new HashMap<>();
+         error.put("success", false);
+         error.put("error", e.getMessage());
+         return ResponseEntity.badRequest().body(error);
+
+     } catch (Exception e) {
+         Map<String, Object> error = new HashMap<>();
+         error.put("success", false);
+         error.put("error", "Error al actualizar factura: " + e.getMessage());
+         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+     }
+ }
+    
+    
+    // =====================================================
+    // OBTENER FACTURAS POR USUARIO
+    // =====================================================
+    @GetMapping("/usuario/{idUsuario}")
+    public ResponseEntity<Map<String, Object>> obtenerFacturasPorUsuario(
+            @PathVariable Long idUsuario
+    ) {
+        try {
+            var facturas = facturaService.obtenerFacturasPorUsuario(idUsuario);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("facturas", facturas);
+            response.put("total", facturas.size());
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("error", "Error al obtener facturas: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
+    // =====================================================
+    // ELIMINAR FACTURA
+    // =====================================================
+    @DeleteMapping("/{idFactura}")
+    public ResponseEntity<Map<String, Object>> eliminarFactura(
+            @PathVariable Long idFactura
+    ) {
+        try {
+            facturaService.eliminarFactura(idFactura);
+
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("mensaje", "Factura eliminada exitosamente");
+
+            return ResponseEntity.ok(response);
+
+        } catch (IllegalArgumentException e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("error", e.getMessage());
+            return ResponseEntity.badRequest().body(error);
+
+        } catch (Exception e) {
+            Map<String, Object> error = new HashMap<>();
+            error.put("success", false);
+            error.put("error", "Error al eliminar factura: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(error);
+        }
+    }
+
+    
     
   //ControllerREG
  // ================= LISTAR TODOS =================
