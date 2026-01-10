@@ -2,12 +2,12 @@
 package com.projectBackend.GMotors.dto;
 
 public class UsuarioRolDTO {
-    private Integer idUsuario;
+    private Long idUsuario;
     private String nombreUsuario;
     private Integer idRol;
     private String nombreRol;
 
-    public UsuarioRolDTO(Integer idUsuario, String nombreUsuario, Integer idRol, String nombreRol) {
+    public UsuarioRolDTO(Long idUsuario, String nombreUsuario, Integer idRol, String nombreRol) {
         this.idUsuario = idUsuario;
         this.nombreUsuario = nombreUsuario;
         this.idRol = idRol;
@@ -15,7 +15,7 @@ public class UsuarioRolDTO {
     }
 
     // getters (y setters si los necesitas)
-    public Integer getIdUsuario() { return idUsuario; }
+    public Long getIdUsuario() { return idUsuario; }
     public String getNombreUsuario() { return nombreUsuario; }
     public Integer getIdRol() { return idRol; }
     public String getNombreRol() { return nombreRol; }

@@ -8,17 +8,29 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 import java.util.Optional;
 
+/*
+ * ¿Por qué JpaRepository<UsuarioRol, UsuarioRolId>?
+ * 
+ * Porque:
+ * 
+ * El primer parámetro (UsuarioRol) es la ENTIDAD
+ * 
+ * El segundo parámetro (UsuarioRolId) es el TIPO DE LA CLAVE PRIMARIA
+ * 
+ * Como usuario_rol tiene una PK compuesta (id_usuario, id_rol),
+ * necesitamos una clase especial (UsuarioRolId) para representarla.
+ */
 @Repository
 public interface UsuarioRolRepository extends JpaRepository<UsuarioRol, UsuarioRolId> {
 
 	// 🔹 Buscar todas las relaciones ACTIVAS por usuario
-	List<UsuarioRol> findByIdUsuarioAndEstado(Integer idUsuario, Integer estado);
+	List<UsuarioRol> findByIdUsuarioAndEstado(Long userId, Integer estado);
 
 	// 🔹 Buscar todas las relaciones ACTIVAS por rol
 	List<UsuarioRol> findByIdRolAndEstado(Integer idRol, Integer estado);
 
 	// 🔹 Buscar relación usuario + rol sin importar estado
-	Optional<UsuarioRol> findByIdUsuarioAndIdRol(Integer idUsuario, Integer idRol);
+	Optional<UsuarioRol> findByIdUsuarioAndIdRol(Long idUsuario, Integer idRol);
 
 	// 🔹 Buscar relación usuario + rol SOLO si está activa
 	Optional<UsuarioRol> findByIdUsuarioAndIdRolAndEstado(Integer idUsuario, Integer idRol, Integer estado);
@@ -28,19 +40,9 @@ public interface UsuarioRolRepository extends JpaRepository<UsuarioRol, UsuarioR
 
 	//---------
 	// Buscar todas las relaciones por id_usuario
-	List<UsuarioRol> findByIdUsuario(Integer idUsuario);
+	List<UsuarioRol> findByIdUsuario(Long usuarioId);
 
 	// Buscar todas las relaciones por id_rol
 	List<UsuarioRol> findByIdRol(Integer idRol);
 }
 
-/*
- * ¿Por qué JpaRepository<UsuarioRol, UsuarioRol>?
- * 
- * Porque:
- * 
- * El primer UsuarioRol es el modelo.
- * 
- * El segundo UsuarioRol es la clave primaria compuesta, que es la misma clase
- * (como lo definiste con @IdClass(UsuarioRol.class)).
- */

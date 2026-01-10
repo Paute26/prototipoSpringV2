@@ -10,7 +10,7 @@ public class UsuarioRol {
 
     @Id
     @Column(name = "id_usuario")
-    private Integer idUsuario;
+    private Long idUsuario;
 
     @Id
     @Column(name = "id_rol")
@@ -29,7 +29,7 @@ public class UsuarioRol {
     @Column(name = "estado", nullable = false)
     private Integer estado = 1; // 1 = activo, 0 = inactivo
 
-    @Column(name = "fecha_creacion", nullable = false, updatable = false)
+    @Column(name = "fecha_creacion", nullable = false)
     private LocalDateTime fechaCreacion = LocalDateTime.now();
 
     @Column(name = "fecha_modificacion")
@@ -38,7 +38,7 @@ public class UsuarioRol {
     // CONSTRUCTORES
     public UsuarioRol() {}
 
-    public UsuarioRol(Integer idUsuario, Integer idRol) {
+    public UsuarioRol(Long idUsuario, Integer idRol) {
         this.idUsuario = idUsuario;
         this.idRol = idRol;
         this.estado = 1;
@@ -46,8 +46,8 @@ public class UsuarioRol {
     }
 
     // GETTERS & SETTERS
-    public Integer getIdUsuario() { return idUsuario; }
-    public void setIdUsuario(Integer idUsuario) { this.idUsuario = idUsuario; }
+    public Long getIdUsuario() { return idUsuario; }
+    public void setIdUsuario(Long idUsuario) { this.idUsuario = idUsuario; }
 
     public Integer getIdRol() { return idRol; }
     public void setIdRol(Integer idRol) { this.idRol = idRol; }
@@ -61,10 +61,18 @@ public class UsuarioRol {
         this.fechaModificacion = LocalDateTime.now();
     }
 
+    public void setFechaCreacion(LocalDateTime fechaCreacion) {
+        this.fechaCreacion = fechaCreacion;
+    }
+    
     public LocalDateTime getFechaCreacion() { return fechaCreacion; }
 
     public LocalDateTime getFechaModificacion() { return fechaModificacion; }
     public void setFechaModificacion(LocalDateTime fechaModificacion) {
         this.fechaModificacion = fechaModificacion;
     }
+    
+    
+    
+    
 }

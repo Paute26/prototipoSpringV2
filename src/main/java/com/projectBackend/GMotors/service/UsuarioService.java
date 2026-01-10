@@ -126,4 +126,9 @@ public class UsuarioService {
 
         return usuario;
     }
+    
+    public Usuario findByCorreo(String email) {
+        return usuarioRepository.findByCorreo(email)
+                .orElse(null);
+    }
 }
